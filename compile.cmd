@@ -1,1 +1,1 @@
-javac -cp "%cd%\gson-2.6.2.jar" *java
+javac -cp "%cd%\gson\gson-2.6.2.jar" *java

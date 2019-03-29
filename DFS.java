@@ -271,6 +271,7 @@ public class DFS
     {
         long guid = md5("Metadata");
         ChordMessageInterface peer = chord.locateSuccessor(guid);
+        System.out.println("\tSaving Metadata to guid: " + guid);//DEBUG
         
         Gson gson = new Gson();
         peer.put(guid, gson.toJson(filesJson));
