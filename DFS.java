@@ -271,7 +271,7 @@ public class DFS
     {
         long guid = md5("Metadata");
         ChordMessageInterface peer = chord.locateSuccessor(guid);
-        System.out.println("\tSaving Metadata to guid: " + guid);//DEBUG
+        System.out.println("\tSaving Metadata to peer: " + peer.getId()); // DEBUG
         
         Gson gson = new Gson();
         peer.put(guid, gson.toJson(filesJson));
@@ -306,6 +306,9 @@ public class DFS
         {
             listOfFiles += files.getFile(i).name + "\n";
         }
+
+        System.out.println(TAG + ":files.size() == " + files.size());//DEBUG
+        if(files.size() == 0 ){return "Empty";}
         
  
         return listOfFiles;

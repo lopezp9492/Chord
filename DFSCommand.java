@@ -47,17 +47,8 @@ public class DFSCommand
 
             if (result[0].equals("list"))
             {
-                if(initialized)
-                {
                     System.out.println("List of files: ");
                     System.out.println(dfs.lists());
-                }
-                else
-                {
-                    System.out.println("No files");
-                }
-
-   
             }
 
             if (result[0].equals("delete"))
