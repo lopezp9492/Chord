@@ -241,7 +241,7 @@ public class DFS
         //DEBUG
         //
         String TAG = "readMetaData";
-        System.out.println(TAG+"()");
+        //System.out.println(TAG+"()");
 
         FilesJson filesJson = null;
         try {
@@ -254,7 +254,7 @@ public class DFS
             scan.useDelimiter("\\A");
             String strMetaData = scan.next();
 
-            System.out.println(strMetaData); // DEBUG
+            //System.out.println(strMetaData); // DEBUG
             filesJson= gson.fromJson(strMetaData, FilesJson.class);
         } catch (NoSuchElementException ex)
         {
@@ -297,7 +297,7 @@ public class DFS
     {
         //DEBUG 
         String TAG = "lists";
-        System.out.println( TAG + "()");
+        //System.out.println( TAG + "()");
 
 
         String listOfFiles = "";
@@ -307,7 +307,7 @@ public class DFS
             listOfFiles += files.getFile(i).name + "\n";
         }
 
-        System.out.println(TAG + ":files.size() == " + files.size());//DEBUG
+        //System.out.println(TAG + ":files.size() == " + files.size());//DEBUG
         if(files.size() == 0 ){return "Empty";}
         
  
