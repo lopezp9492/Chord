@@ -290,7 +290,7 @@ public class DFS
   
 /**
  * List the files in the system
-  *
+ *
  * @param filename Name of the file
  */
     public String lists() throws Exception
@@ -338,10 +338,10 @@ public class DFS
 
         // Variables
         int songs_per_page = 1000;
-  
-        PagesJson page = new PagesJson();     // metadata
-        FileJson file = new FileJson();       // metadata
-        FilesJson metadata = new FilesJson(); // metadata
+        ArrayList<CatalogItem> pageItems = new ArrayList<CatalogItem>();// Data
+        PagesJson page = new PagesJson();    	// metadata
+        FileJson file = new FileJson();      	// metadata
+        FilesJson metadata = new FilesJson();	// metadata
         Long page_size = (long) 0;
         Long file_size = (long) 0;
 
@@ -350,12 +350,13 @@ public class DFS
         // for each item in catalog save it to a "page"
         for(int i = 0 ; i < catalogItems.size(); i++ )
         {
-            //Add catalog item to JsonObject
 
 
             // Page groups of size "songs_per_page"
             page_size =  page_size + 1;
-            //page_size = content.getContentLength();
+
+            //get item from catalog and add it to the page
+            pageItems.add(catalogItems.get(i));
             
             if( (i+1)%songs_per_page == 0)
             {
@@ -380,10 +381,16 @@ public class DFS
                 file_size += page_size;
                 page_size = (long) 0;
 
-                //4) Save page at its corresponding node
-                //ChordMessageInterface peer = chord.locateSuccessor(guid); // locate successor
-                //Gson gson = new Gson();
+                // Save page at its corresponding node
+                ChordMessageInterface peer = chord.locateSuccessor(guid); // locate successor
+                System.out.println("\tSaving page to node: " + peer.getId());//DEBUG
+                Gson gson = new Gson();
+                String jsonString = gson.toJson(pageItems);//Convert ArrayList to Json
+                peer.put(guid, jsonString);// send page
                 //peer.put(guid, gson.toJson(filesJson));// send page
+
+                //reset page
+                pageItems = new ArrayList<CatalogItem>();
             }
 
 
@@ -398,14 +405,14 @@ public class DFS
                 System.out.println("\tpage_size = " + page_size); // DEBUG
 
 
-                //2)Hash each page (name + time stamp) to get its GUID
+                // Hash each page (name + time stamp) to get its GUID
                 Long timeStamp = System.currentTimeMillis();
                 Long guid = md5(fileName + timeStamp);
                 System.out.println("\tguid = "  + guid ); // DEBUG
 
 
-                page.setGUID(guid);         //add page_guid to metadata 
-                page.setSize(page_size);    //add page size to metadata
+                page.setGUID(guid);         //add page guid to metadata 
+                page.setSize(page_size);    //add page_size to metadata
                 file.addPage(page);         //add page to file
 
 
@@ -413,14 +420,20 @@ public class DFS
                 page_size = (long) 0;
 
 
-                //4) Save page at its corresponding node
-                //ChordMessageInterface peer = chord.locateSuccessor(guid); // locate successor
-                //Gson gson = new Gson();
+                // Save page at its corresponding node
+                ChordMessageInterface peer = chord.locateSuccessor(guid); // locate successor
+                System.out.println("\tSaving page to node: " + peer.getId());//DEBUG
+                Gson gson = new Gson();
+                String jsonString = gson.toJson(pageItems);//Convert ArrayList to Json
+                peer.put(guid, jsonString);// send page
                 //peer.put(guid, gson.toJson(filesJson));// send page
+
+                //reset page
+                pageItems = new ArrayList<CatalogItem>();
             }
         }
 
-        //3 save metadata.json to Chord
+        // Save metadata.json to Chord
         file.setName(fileName);
         file.setSize(file_size);
         metadata.addFile(file);
