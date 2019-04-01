@@ -109,10 +109,16 @@ public class DFSCommand
 
         System.out.println("\tcreate");
         System.out.println("\tlist");
-        System.out.println("\tdelete");
+        System.out.println("\tdelete (not implemented)");
 
         System.out.println("\tread");
-        System.out.println("\tquit");
+        System.out.println("\tmove  (not implemented)");
+        System.out.println("\append (not implemented)");
+
+
+
+
+        System.out.println("\tquit (crashes?)");
     }
 
     
