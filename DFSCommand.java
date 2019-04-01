@@ -1,11 +1,14 @@
 
 import java.io.*;
-
+import java.util.*;
+import com.google.gson.Gson;
 
 public class DFSCommand
 {
     DFS dfs;
     Boolean initialized = false;
+    Boolean running = true;
+    String TAG = "DFSCommand"; // DEBUG
         
     public DFSCommand(int p, int portToJoin) throws Exception {
         dfs = new DFS(p);
@@ -20,7 +23,8 @@ public class DFSCommand
         
         BufferedReader buffer=new BufferedReader(new InputStreamReader(System.in));
         String line = buffer.readLine();  
-        while (!line.equals("quit"))
+        //while (!line.equals("quit"))
+        while(running)
         {
             String[] result = line.split("\\s");
             if (result[0].equals("join")  && result.length > 1)
@@ -55,9 +59,38 @@ public class DFSCommand
             {
                 dfs.delete("music.json");
             }
+
+            if(result[0].equals("read"))
+            {
+                //TEST
+
+                //Remote Input File Stream
+                RemoteInputFileStream dataraw = dfs.read("music.json", 1);
+                System.out.println("\t"+ TAG+":connecting."); // DEBUG
+                dataraw.connect();
+
+                //Scanner
+                System.out.println("\t" + TAG+":scanning."); // DEBUG
+                Scanner scan = new Scanner(dataraw);
+                scan.useDelimiter("\\A");
+                String data = scan.next();
+                System.out.println(data); // DEBUG
+
+                //Convert from json to ArrayList
+                System.out.println("\t" + TAG + ":converting json to CatalogPage.");
+                //ArrayList<CatalogItem> pageItems = new ArrayList<CatalogItem>();// Data //OLD
+                CatalogPage page = new CatalogPage();
+                Gson gson = new Gson();
+                page = gson.fromJson(data, CatalogPage.class);
+                //final ArrayList<?> jsonArray = new Gson().fromJson(array.toString(), ArrayList.class);
+
+                System.out.println("\t" + TAG + ":Read Complete.");
+
+            }
             if(result[0].equals("quit"))
             {
-                System.out.println("ending...");
+                System.out.println("stoping...");
+                running = false;
                 return;
             }
 
@@ -73,9 +106,12 @@ public class DFSCommand
         System.out.println("\tjoin");
         System.out.println("\tprint");
         System.out.println("\tleave");
+
         System.out.println("\tcreate");
         System.out.println("\tlist");
         System.out.println("\tdelete");
+
+        System.out.println("\tread");
         System.out.println("\tquit");
     }
 

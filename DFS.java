@@ -153,14 +153,39 @@ public class DFS
             return files.size();
          }
     };
-    
-    //DFS Variables
+    // END METADATA CLASSES---------------------------
 
-    ArrayList<CatalogItem> catalogItems;
-    int port;
-    Chord  chord;
-    
-    //END DFS Variables
+/**
+    // CatalogPage CLASS------------------------------
+    public class CatalogPage
+    {
+         List<CatalogItem> items;
+         public CatalogPage() 
+         {
+             items = new ArrayList<CatalogItem>();
+         }
+
+        // getters
+         public CatalogItem getItem(int i)
+         {
+            return this.items.get(i);
+         }
+
+         public int size()
+         {
+            return items.size();
+         }
+
+        // setters
+         public void addItem(CatalogItem item)
+         {
+            this.items.add(item);
+         }
+    };
+
+    //END CatalogPage CLASS------------------------------
+**/
+    //HASH FUNCTION
     
     private long md5(String objectName)
     {
@@ -180,9 +205,15 @@ public class DFS
         return 0;
     }
 
-    //END METADATA CLASSES---------------------------------------
+    //END HELPER CLASSES---------------------------------------
     
+    //DFS Variables
+
+    ArrayList<CatalogItem> catalogItems;
+    int port;
+    Chord  chord;
     
+    //END DFS Variables
     
     public DFS(int port) throws Exception
     {
@@ -337,8 +368,9 @@ public class DFS
         System.out.println(TAG + ":catalogItems.size() = " + catalogItems.size()); //DEBUG 
 
         // Variables
-        int songs_per_page = 1000;
-        ArrayList<CatalogItem> pageItems = new ArrayList<CatalogItem>();// Data
+        int songs_per_page = 50;
+        CatalogPage catalogpage = new CatalogPage(); // Data
+        //ArrayList<CatalogItem> pageItems = new ArrayList<CatalogItem>();// Data // OLD
         PagesJson page = new PagesJson();    	// metadata
         FileJson file = new FileJson();      	// metadata
         FilesJson metadata = new FilesJson();	// metadata
@@ -356,7 +388,8 @@ public class DFS
             page_size =  page_size + 1;
 
             //get item from catalog and add it to the page
-            pageItems.add(catalogItems.get(i));
+            //pageItems.add(catalogItems.get(i)); //OLD
+            catalogpage.addItem(catalogItems.get(i));
             
             if( (i+1)%songs_per_page == 0)
             {
@@ -385,14 +418,16 @@ public class DFS
                 ChordMessageInterface peer = chord.locateSuccessor(guid); // locate successor
                 System.out.println("\tSaving page to node: " + peer.getId());//DEBUG
                 Gson gson = new Gson();
-                String jsonString = gson.toJson(pageItems);//Convert ArrayList to Json
+                //String jsonString = gson.toJson(pageItems);//Convert ArrayList to Json // OLD
+                String jsonString = gson.toJson(catalogpage);//Convert CatalogPage to Json
+
                 peer.put(guid, jsonString);// send page
                 //peer.put(guid, gson.toJson(filesJson));// send page
 
                 //reset page
-                pageItems = new ArrayList<CatalogItem>();
+                //pageItems = new ArrayList<CatalogItem>(); //OLD
+                catalogpage = new CatalogPage();
             }
-
 
             //Save Last Page if its smaller than "songs_per_page"
             else if(i == catalogItems.size()-1 )
@@ -424,12 +459,16 @@ public class DFS
                 ChordMessageInterface peer = chord.locateSuccessor(guid); // locate successor
                 System.out.println("\tSaving page to node: " + peer.getId());//DEBUG
                 Gson gson = new Gson();
-                String jsonString = gson.toJson(pageItems);//Convert ArrayList to Json
+                //String jsonString = gson.toJson(pageItems);//Convert ArrayList to Json //OLD
+                String jsonString = gson.toJson(catalogpage);//Convert ArrayList to Json
+
                 peer.put(guid, jsonString);// send page
                 //peer.put(guid, gson.toJson(filesJson));// send page
 
                 //reset page
-                pageItems = new ArrayList<CatalogItem>();
+                //pageItems = new ArrayList<CatalogItem>(); // OLD
+                catalogpage = new CatalogPage();
+
             }
         }
 
@@ -477,19 +516,59 @@ public class DFS
  */
     public void delete(String fileName) throws Exception
     {
-     
+     	//TODO: 
+     	//Read metadata
+     	//find filename in metadata
+     	//for each page of file 
+     		//delete page
         
     }
     
 /**
- * Read block pageNumber of fileName 
+ * Read block pageNumber of fileName //read catalogpage
   *
  * @param filename Name of the file
  * @param pageNumber number of block. 
  */
     public RemoteInputFileStream read(String fileName, int pageNumber) throws Exception
     {
-        return null;
+    	//TODO: TEST
+
+    	//DONE:
+     	//Read metadata
+     	//find filename in metadata
+     	//find guid of pageNumber in metadata
+     	//request page 
+
+     	//Debug 
+     	String TAG = "read";
+     	System.out.println(TAG + "(fileName, pageNumber)");
+     	System.out.println(TAG + "(" + fileName + ", " + pageNumber);
+
+    	//Read Metadata 
+    	FilesJson metadata = readMetaData();
+    	long guid = (long) 0;
+
+    	//Find File in metadata
+    	//for(FileJson filejson : metadata)
+    	for(int i = 0; i < metadata.size(); i++)
+		{
+			FileJson filejson = metadata.getFile(i);
+			System.out.println("filejson.getName: " + filejson.getName()+")"); // DEBUG
+
+			//if x.getName == filename
+			if(filejson.getName().equals(fileName) )
+			{
+				System.out.println("name matched"); // DEBUG
+				//get guid of page with "pageNumber"
+				guid = filejson.getPage(pageNumber).getGUID();
+				System.out.println("guid retrieved"); // DEBUG
+				break;
+			}
+		}
+
+        ChordMessageInterface peer = chord.locateSuccessor(guid);
+		return peer.get(guid);
     }
     
  /**

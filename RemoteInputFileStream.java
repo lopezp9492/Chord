@@ -16,6 +16,7 @@ import java.util.concurrent.Semaphore;
 
 public class RemoteInputFileStream extends InputStream implements Serializable {
 
+    private String TAG = "RemoteInputFileStream";
     public InetAddress IP;
     public int port;
     public int total;
@@ -119,7 +120,8 @@ public class RemoteInputFileStream extends InputStream implements Serializable {
             public void run() {
                 try
                 {
-                    Thread.sleep(500);
+                    System.out.println("\n\t" + TAG + ".getBuff()");
+                    Thread.sleep(1000);
                     input.read(nextBuf);
                     sem.release();
        //             System.out.println("Read buffer");
