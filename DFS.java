@@ -155,38 +155,8 @@ public class DFS
     };
     // END METADATA CLASSES---------------------------
 
-/**
-    // CatalogPage CLASS------------------------------
-    public class CatalogPage
-    {
-         List<CatalogItem> items;
-         public CatalogPage() 
-         {
-             items = new ArrayList<CatalogItem>();
-         }
 
-        // getters
-         public CatalogItem getItem(int i)
-         {
-            return this.items.get(i);
-         }
-
-         public int size()
-         {
-            return items.size();
-         }
-
-        // setters
-         public void addItem(CatalogItem item)
-         {
-            this.items.add(item);
-         }
-    };
-
-    //END CatalogPage CLASS------------------------------
-**/
     //HASH FUNCTION
-    
     private long md5(String objectName)
     {
         try
@@ -353,7 +323,11 @@ public class DFS
     public void create(String fileName) throws Exception
     {
 
-        // TODO:
+    	//TODO:
+    	//Accept .mp3 files
+
+        // DONE:
+        // Accept music.json
         // Write Metadata
         // Write Pages
 
@@ -532,7 +506,9 @@ public class DFS
  */
     public RemoteInputFileStream read(String fileName, int pageNumber) throws Exception
     {
-    	//TODO: TEST
+    	//TODO: 
+    	//TEST different pageNumbers
+
 
     	//DONE:
      	//Read metadata
