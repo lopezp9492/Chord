@@ -80,15 +80,17 @@ public class DFS
     {
         String name;
         Long   size;
+        int   numberOfItems;
+        int   itemsPerPage;
         ArrayList<PagesJson> pages;
         public FileJson()
         {
             this.name = "not set";
             this.size = (long) 0;
+            this.numberOfItems = 0;
+            this.itemsPerPage =  0;
             this.pages = new ArrayList<PagesJson>();
-
         }
-
         // getters
         public String getName()
         {
@@ -97,6 +99,18 @@ public class DFS
         public Long getSize()
         {
             return this.size;
+        }
+        public int getNumberOfItems()
+        {
+            return this.numberOfItems;
+        }
+        public int getItemsPerPage()
+        {
+            return this.itemsPerPage;
+        }
+         public int getNumberOfPages()
+        {
+            return this.pages.size();
         }
         public ArrayList<PagesJson> getPages()
         {
@@ -510,6 +524,8 @@ public class DFS
      	//for each page of file 
      		//delete page
 
+    	String TAG = "delete";
+
     	FilesJson metadata = readMetaData();
     	FileJson  file = new FileJson();
 
@@ -519,9 +535,12 @@ public class DFS
     		if(metadata.getFile(i).getName().equals(fileName))
     		{
     			file = metadata.getFile(i);
+    			System.out.println(TAG+": file size: " + file.getSize()); // DEBUG
+    			System.out.println(TAG+": numberOfPages: " + file.getNumberOfPages()); // DEBUG
+
 
     			// delete all pages of file
-    			for(int j = 0 ; j < file.getSize()-1; j++)
+    			for(int j = 0 ; j < file.getNumberOfPages()-1; j++)
     			{
     			
     				Long guid  = file.getPage(j).getGUID();
