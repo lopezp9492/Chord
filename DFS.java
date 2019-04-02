@@ -133,8 +133,11 @@ public class DFS
         }
         public void setPages(ArrayList<PagesJson> pages)
         {
-            //TODO Is this a shallow copy?
-            this.pages = pages;
+            this.pages = new ArrayList<PagesJson>(); 
+        	for(int i = 0 ; i < pages.size(); i++)
+        	{
+        		this.pages.add(pages.get(i));
+        	}
         } 
         public void addPage(PagesJson page)
         {
@@ -366,7 +369,7 @@ public class DFS
         return listOfFiles;
     }
 
-    public Long generateGUID(Sting fileName)
+    public Long generateGUID(String fileName)
     {
         Long timeStamp = System.currentTimeMillis();
         return md5(fileName + timeStamp);
@@ -620,7 +623,6 @@ public class DFS
     {
     	//appending? mp3? or music.json CatalogItem?
 
-        //TODO 
     	//generate guid
         Long timeStamp = System.currentTimeMillis();
         Long guid = md5(fileName + timeStamp);
@@ -628,6 +630,12 @@ public class DFS
 
 
     	//update metadata
+    		//get metadata
+           	FilesJson metadata = readMetaData();
+
+        	//add data to page
+        	//TODO 
+
 
     	//locate peer
     	ChordMessageInterface peer = chord.locateSuccessor(guid);
