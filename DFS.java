@@ -372,6 +372,11 @@ public class DFS
         return md5(fileName + timeStamp);
     }
 
+    public void createMP3(String fileName)
+    {
+
+    }
+
 	/**
 	 * create an empty file 
 	  *
@@ -447,7 +452,6 @@ public class DFS
             //Save Last Page if its smaller than "songs_per_page"
             else if(i == catalogItems.size()-1 )
             {
-
                 // DEBUG
                 System.out.println("\tLast Page: smaller than " + songs_per_page); // DEBUG
                 System.out.println("\tpage_size = " + page_size); // DEBUG
@@ -614,6 +618,23 @@ public class DFS
 	 */
     public void append(String filename, RemoteInputFileStream data) throws Exception
     {
+    	//appending? mp3? or music.json CatalogItem?
+
+        //TODO 
+    	//generate guid
+        Long timeStamp = System.currentTimeMillis();
+        Long guid = md5(fileName + timeStamp);
+        System.out.println("\tguid = "  + guid ); // DEBUG
+
+
+    	//update metadata
+
+    	//locate peer
+    	ChordMessageInterface peer = chord.locateSuccessor(guid);
+        System.out.println("\tSaving Page to peer: " + peer.getId()); // DEBUG
         
+    	//save data to peer
+    	peer.put(guid, data); // send page
+
     }
 }
