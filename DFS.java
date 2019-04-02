@@ -46,11 +46,11 @@ public class DFS
     public class PagesJson
     {
         Long guid;
-        Long size;
+        int size;
         public PagesJson()
         {
             guid = (long) 0;
-            size = (long) 0;
+            size = 0;
         }
 
         // getters
@@ -59,7 +59,7 @@ public class DFS
             return guid;
         }
 
-        public Long getSize()
+        public int getSize()
         {
             return size;
         }
@@ -69,7 +69,7 @@ public class DFS
         {
             this.guid = guid;
         }
-        public void setSize(Long size)
+        public void setSize(int size)
         {
             this.size = size;
         }
@@ -139,6 +139,15 @@ public class DFS
         public void addPage(PagesJson page)
         {
             this.pages.add(page);
+            this.size += page.getSize();
+        }
+		public void addPage(Long guid, int page_size)
+        {
+            PagesJson page = new PagesJson();		//metadata
+            page.setGUID(guid);         			//metadata
+            page.setSize(page_size);    			//metadata
+
+            this.addPage(page);
         }
     };
     
@@ -387,10 +396,9 @@ public class DFS
         int songs_per_page = 50;
         CatalogPage catalogpage = new CatalogPage(); // Data
         //ArrayList<CatalogItem> pageItems = new ArrayList<CatalogItem>();// Data // OLD
-        PagesJson page = new PagesJson();    	// metadata
         FileJson file = new FileJson();      	// metadata
         FilesJson metadata = new FilesJson();	// metadata
-        Long page_size = (long) 0;
+        int page_size = 0;
         Long file_size = (long) 0;
 
 
@@ -409,7 +417,6 @@ public class DFS
             //if page size reaches "songs_per_page" save the page
             if( (i+1)%songs_per_page == 0)
             {
-                page = new PagesJson();//metadata
 
                 // DEBUG
                 //System.out.println("i + 1 = " + (i+1) );
@@ -421,25 +428,21 @@ public class DFS
                 Long guid = md5(fileName + timeStamp);
                 System.out.println("\tguid = "  + guid ); // DEBUG
 
-                //Update MetaData
-                page.setGUID(guid);         //add page_guid to metadata
-                page.setSize(page_size);    //add page size to metadata
-                file.addPage(page);         //add page to file in metadata
-                file_size += page_size;
-                page_size = (long) 0;
-
+                // Update MetaData
+                file.addPage(guid, page_size); // metadata
 
                 // Save page at its corresponding node
                 writePageData(catalogpage, guid);
 
                 //reset page
                 catalogpage = new CatalogPage();
+                page_size = 0; // metadata
+
             }
 
             //Save Last Page if its smaller than "songs_per_page"
             else if(i == catalogItems.size()-1 )
             {
-                page = new PagesJson(); 
 
                 // DEBUG
                 System.out.println("\tLast Page: smaller than " + songs_per_page); // DEBUG
@@ -453,11 +456,7 @@ public class DFS
                 System.out.println("\tguid = "  + guid ); // DEBUG
 
                 //Update MetaData
-                page.setGUID(guid);         //add page guid to metadata 
-                page.setSize(page_size);    //add page_size to metadata
-                file.addPage(page);         //add page to file
-				file_size += page_size;
-                page_size = (long) 0;
+                file.addPage(guid, page_size); // metadata
 
 
                 // Save page at its corresponding node
@@ -465,6 +464,7 @@ public class DFS
 
                 //reset page
                 catalogpage = new CatalogPage();
+                page_size = 0;
             }
         }
 

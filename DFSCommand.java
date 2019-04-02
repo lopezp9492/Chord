@@ -125,7 +125,7 @@ public class DFSCommand
 
 
 
-        System.out.println("\tquit (crashes?)");
+        System.out.println("\tquit (freezes?)");
     }
 
     
