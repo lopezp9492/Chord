@@ -152,6 +152,20 @@ public class DFS
          {
             return files.size();
          }
+
+         public void deleteFile(String fileName)
+         {
+         	int index_to_remove = 0;
+         	for(int i = 0 ; i < files.size(); i++)
+         	{
+         		if(files.get(i).getName().equals(fileName))
+         		{
+					index_to_remove = i;
+         		}
+         	}
+
+         	files.remove(index_to_remove);
+         }
     };
     // END METADATA CLASSES---------------------------
 
@@ -495,7 +509,37 @@ public class DFS
      	//find filename in metadata
      	//for each page of file 
      		//delete page
-        
+
+    	FilesJson metadata = readMetaData();
+    	FileJson  file = new FileJson();
+
+    	//find file
+    	for(int i = 0 ; i < metadata.size(); i++)
+    	{
+    		if(metadata.getFile(i).getName().equals(fileName))
+    		{
+    			file = metadata.getFile(i);
+
+    			// delete all pages of file
+    			for(int j = 0 ; j < file.getSize()-1; j++)
+    			{
+    			
+    				Long guid  = file.getPage(j).getGUID();
+    				System.out.println("\tdeleting page: " + j); 	// DEBUG
+    				System.out.println("\tguid: " + guid ); 		// DEBUG
+    				ChordMessageInterface peer = chord.locateSuccessor(guid); // locate successor
+    				peer.delete(guid);
+    			}
+
+    			//Update metadata
+    			//TODO
+    			metadata.deleteFile(fileName);
+    			System.out.println("delete done." ); // DEBUG
+    			writeMetaData(metadata);
+    			return;
+    		}
+    	}
+    	System.out.println("file not found: " + fileName); // DEBUG
     }
     
 /**
