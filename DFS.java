@@ -241,10 +241,10 @@ public class DFS
     }
     
   
-/**
- * Join the chord
-  *
- */
+	/**
+	 * Join the chord
+	  *
+	 */
     public void join(String Ip, int port) throws Exception
     {
         chord.joinRing(Ip, port);
@@ -252,28 +252,28 @@ public class DFS
     }
     
     
-   /**
- * leave the chord
-  *
- */ 
+	 /**
+	 * leave the chord
+	  *
+	 */ 
     public void leave() throws Exception
     {        
        chord.leave();
     }
   
-   /**
- * print the status of the peer in the chord
-  *
- */
+	 /**
+	 * print the status of the peer in the chord
+	  *
+	 */
     public void print() throws Exception
     {
         chord.print();
     }
     
-/**
- * readMetaData read the metadata from the chord
-  *
- */
+	/**
+	 * readMetaData read the metadata from the chord
+	  *
+	 */
     public FilesJson readMetaData() throws Exception
     {
         //DEBUG
@@ -301,10 +301,10 @@ public class DFS
         return filesJson;
     }
     
-/**
- * writeMetaData write the metadata back to the chord
-  *
- */
+	/**
+	 * writeMetaData write the metadata back to the chord
+	  *
+	 */
     public void writeMetaData(FilesJson filesJson) throws Exception
     {
         long guid = md5("Metadata");
@@ -315,10 +315,10 @@ public class DFS
         peer.put(guid, gson.toJson(filesJson));
     }
 
-    /**
- * writePageData write the page data to the chord
-  *
- */
+	/**
+	 * writePageData write the page data to the chord
+	  *
+	 */
     public void writePageData(CatalogPage catalogpage, Long guid) throws Exception
     {
         ChordMessageInterface peer = chord.locateSuccessor(guid);
@@ -329,10 +329,10 @@ public class DFS
         peer.put(guid, jsonString); // send page
     }
    
-/**
- * Change Name
-  *
- */
+	/**
+	 * Change Name
+	  *
+	 */
     public void move(String oldName, String newName) throws Exception
     {
         // TODO:  Change the name in Metadata
@@ -340,11 +340,11 @@ public class DFS
     }
 
   
-/**
- * List the files in the system
- *
- * @param filename Name of the file
- */
+	/**
+	 * List the files in the system
+	 *
+	 * @param filename Name of the file
+	 */
     public String lists() throws Exception
     {
         //DEBUG 
@@ -366,11 +366,17 @@ public class DFS
         return listOfFiles;
     }
 
-/**
- * create an empty file 
-  *
- * @param filename Name of the file
- */
+    public Long generateGUID(Sting fileName)
+    {
+        Long timeStamp = System.currentTimeMillis();
+        return md5(fileName + timeStamp);
+    }
+
+	/**
+	 * create an empty file 
+	  *
+	 * @param filename Name of the file
+	 */
     public void create(String fileName) throws Exception
     {
 
@@ -422,7 +428,6 @@ public class DFS
                 //System.out.println("i + 1 = " + (i+1) );
                 System.out.println("\tpage_size = " + page_size);
 
-
                 // Hash each page (name + time stamp) to get its GUID
                 Long timeStamp = System.currentTimeMillis();
                 Long guid = md5(fileName + timeStamp);
@@ -437,7 +442,6 @@ public class DFS
                 //reset page
                 catalogpage = new CatalogPage();
                 page_size = 0; // metadata
-
             }
 
             //Save Last Page if its smaller than "songs_per_page"
@@ -446,9 +450,8 @@ public class DFS
 
                 // DEBUG
                 System.out.println("\tLast Page: smaller than " + songs_per_page); // DEBUG
-                //System.out.println("i + 1 = " + (i+1) );
                 System.out.println("\tpage_size = " + page_size); // DEBUG
-
+                //System.out.println("i + 1 = " + (i+1) ); // DEBUG
 
                 // Hash each page (name + time stamp) to get its GUID
                 Long timeStamp = System.currentTimeMillis();
@@ -457,7 +460,6 @@ public class DFS
 
                 //Update MetaData
                 file.addPage(guid, page_size); // metadata
-
 
                 // Save page at its corresponding node
                 writePageData(catalogpage, guid);
@@ -505,11 +507,11 @@ public class DFS
         }
     }
     
-/**
- * delete file 
-  *
- * @param filename Name of the file
- */
+	/**
+	 * delete file 
+	  *
+	 * @param filename Name of the file
+	 */
     public void delete(String fileName) throws Exception
     {
      	//TODO: 
@@ -555,12 +557,12 @@ public class DFS
     	System.out.println("file not found: " + fileName); // DEBUG
     }
     
-/**
- * Read block pageNumber of fileName //read catalogpage
-  *
- * @param filename Name of the file
- * @param pageNumber number of block. 
- */
+	/**
+	 * Read block pageNumber of fileName //read catalogpage
+	  *
+	 * @param filename Name of the file
+	 * @param pageNumber number of block. 
+	 */
     public RemoteInputFileStream read(String fileName, int pageNumber) throws Exception
     {
     	//TODO: 
@@ -604,17 +606,14 @@ public class DFS
 		return peer.get(guid);
     }
     
- /**
- * Add a page to the file                
-  *
- * @param filename Name of the file
- * @param data RemoteInputStream. 
- */
+	 /**
+	 * Add a page to the file                
+	  *
+	 * @param filename Name of the file
+	 * @param data RemoteInputStream. 
+	 */
     public void append(String filename, RemoteInputFileStream data) throws Exception
     {
         
     }
-
-
-    
 }
