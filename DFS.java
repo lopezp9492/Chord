@@ -305,6 +305,20 @@ public class DFS
         Gson gson = new Gson();
         peer.put(guid, gson.toJson(filesJson));
     }
+
+    /**
+ * writePageData write the page data to the chord
+  *
+ */
+    public void writePageData(CatalogPage catalogpage, Long guid) throws Exception
+    {
+        ChordMessageInterface peer = chord.locateSuccessor(guid);
+        System.out.println("\tSaving Page to peer: " + peer.getId()); // DEBUG
+        
+        Gson gson = new Gson();
+        String jsonString = gson.toJson(catalogpage); // Convert CatalogPage to Json
+        peer.put(guid, jsonString); // send page
+    }
    
 /**
  * Change Name
@@ -390,12 +404,12 @@ public class DFS
             page_size =  page_size + 1;
 
             //get item from catalog and add it to the page
-            //pageItems.add(catalogItems.get(i)); //OLD
             catalogpage.addItem(catalogItems.get(i));
             
+            //if page size reaches "songs_per_page" save the page
             if( (i+1)%songs_per_page == 0)
             {
-                page = new PagesJson(); 
+                page = new PagesJson();//metadata
 
                 // DEBUG
                 //System.out.println("i + 1 = " + (i+1) );
@@ -407,27 +421,18 @@ public class DFS
                 Long guid = md5(fileName + timeStamp);
                 System.out.println("\tguid = "  + guid ); // DEBUG
 
-
+                //Update MetaData
                 page.setGUID(guid);         //add page_guid to metadata
                 page.setSize(page_size);    //add page size to metadata
                 file.addPage(page);         //add page to file in metadata
-
-
                 file_size += page_size;
                 page_size = (long) 0;
 
-                // Save page at its corresponding node
-                ChordMessageInterface peer = chord.locateSuccessor(guid); // locate successor
-                System.out.println("\tSaving page to node: " + peer.getId());//DEBUG
-                Gson gson = new Gson();
-                //String jsonString = gson.toJson(pageItems);//Convert ArrayList to Json // OLD
-                String jsonString = gson.toJson(catalogpage);//Convert CatalogPage to Json
 
-                peer.put(guid, jsonString);// send page
-                //peer.put(guid, gson.toJson(filesJson));// send page
+                // Save page at its corresponding node
+                writePageData(catalogpage, guid);
 
                 //reset page
-                //pageItems = new ArrayList<CatalogItem>(); //OLD
                 catalogpage = new CatalogPage();
             }
 
@@ -447,30 +452,19 @@ public class DFS
                 Long guid = md5(fileName + timeStamp);
                 System.out.println("\tguid = "  + guid ); // DEBUG
 
-
+                //Update MetaData
                 page.setGUID(guid);         //add page guid to metadata 
                 page.setSize(page_size);    //add page_size to metadata
                 file.addPage(page);         //add page to file
-
-
-                file_size += page_size;
+				file_size += page_size;
                 page_size = (long) 0;
 
 
                 // Save page at its corresponding node
-                ChordMessageInterface peer = chord.locateSuccessor(guid); // locate successor
-                System.out.println("\tSaving page to node: " + peer.getId());//DEBUG
-                Gson gson = new Gson();
-                //String jsonString = gson.toJson(pageItems);//Convert ArrayList to Json //OLD
-                String jsonString = gson.toJson(catalogpage);//Convert ArrayList to Json
-
-                peer.put(guid, jsonString);// send page
-                //peer.put(guid, gson.toJson(filesJson));// send page
+                writePageData(catalogpage, guid);
 
                 //reset page
-                //pageItems = new ArrayList<CatalogItem>(); // OLD
                 catalogpage = new CatalogPage();
-
             }
         }
 

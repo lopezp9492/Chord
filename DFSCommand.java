@@ -116,12 +116,12 @@ public class DFSCommand
         System.out.println("\tcreate (loads music.json into DFS)");
         System.out.println("\tlist   (displays files in DFS)");
         System.out.println("\tread   (reads page 1 of music.json)");
-        
-        System.out.println("\tdelete (in progress)");
+
+        System.out.println("\tdelete (deletes music.json)");
         System.out.println("\tmove   (not implemented)");
         System.out.println("\tappend (not implemented)");
 
-        System.out.println("\tgetID ()");
+        System.out.println("\tgetID  ()");
 
 
 
