@@ -62,10 +62,18 @@ public class DFSCommand
 
             if(result[0].equals("read"))
             {
-                //TEST
+
+                //default page number = 1
+                int pageNumber = 1;
+
+                //If page specified update pageNumber
+                if(result.length > 1)
+                {
+                    pageNumber = Integer.parseInt(result[1]);
+                } 
 
                 //Remote Input File Stream
-                RemoteInputFileStream dataraw = dfs.read("music.json", 1);
+                RemoteInputFileStream dataraw = dfs.read("music.json", pageNumber);
                 System.out.println("\t"+ TAG+":connecting."); // DEBUG
                 dataraw.connect();
 
@@ -78,11 +86,9 @@ public class DFSCommand
 
                 //Convert from json to ArrayList
                 System.out.println("\t" + TAG + ":converting json to CatalogPage.");
-                //ArrayList<CatalogItem> pageItems = new ArrayList<CatalogItem>();// Data //OLD
                 CatalogPage page = new CatalogPage();
                 Gson gson = new Gson();
                 page = gson.fromJson(data, CatalogPage.class);
-                //final ArrayList<?> jsonArray = new Gson().fromJson(array.toString(), ArrayList.class);
 
                 System.out.println("\t" + TAG + ":Read Complete.");
 
@@ -107,14 +113,14 @@ public class DFSCommand
         System.out.println("\tprint");
         System.out.println("\tleave");
 
-        System.out.println("\tcreate");
-        System.out.println("\tlist");
-        System.out.println("\tdelete (not implemented)");
+        System.out.println("\tcreate (loads music.json into DFS)");
+        System.out.println("\tlist   (displays files in DFS)");
+        System.out.println("\tread   (reads page 1 of music.json)");
+        System.out.println("\tdelete (in progress)");
+        System.out.println("\tmove   (not implemented)");
+        System.out.println("\tappend (not implemented)");
 
-        System.out.println("\tread");
-        System.out.println("\tmove  (not implemented)");
-        System.out.println("\append (not implemented)");
-
+        System.out.println("\tgetID ()");
 
 
 
