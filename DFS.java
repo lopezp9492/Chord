@@ -5,14 +5,15 @@ import java.io.*;
 import java.nio.file.*;
 import java.math.BigInteger;
 import java.security.*;
-import com.google.gson.Gson;
 import java.io.InputStream;
 import java.util.*;
 
-//import com.google.gson.Gson;
+import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-//import CatalogItem.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 
 
 
@@ -612,14 +613,123 @@ public class DFS
         ChordMessageInterface peer = chord.locateSuccessor(guid);
 		return peer.get(guid);
     }
+
+    public JsonObject search(String filter, int count)
+    {
+    	//return variable
+		JsonArray ret = new JsonArray();
+
+
+    	//Get Metadata
+    	try{
+	    	FilesJson files = readMetaData();
+
+	    	//Find music.json in metadata
+    		FileJson file = files.getFile(0);
+
+	    	//Find count number of songs
+	    	int songs_found = 0;
+
+			//search page by page in music.json
+			for(int index = 0 ; index < file.getSize(); index++)
+			{
+				//request page
+				CatalogPage catalogpage = getCatalogPage(index);
+
+				//search each item in the catalogpage
+				for(int j = 0 ; j < catalogpage.size(); j++)
+				{
+					CatalogItem ci = catalogpage.getItem(j);
+
+					//if item passes filter
+					if(ci.passesFilter(filter))
+					{
+						//add to response
+						ret.add(ci.getJson());
+
+						songs_found++;
+						if(songs_found >= count)
+						{
+							JsonObject response = new JsonObject();
+							response.add("ret", ret);
+							return response;
+						}
+					}
+
+				}
+			}
+			//searched all pages.
+			//return empty json array;
+			JsonObject response = new JsonObject();
+			response.add("ret", ret);
+			return response;
+
+		} catch (IOException e) {
+            e.printStackTrace();
+
+			//error happened in readmetadata?.
+			//return empty json array;
+			JsonObject response = new JsonObject();
+			response.add("ret", ret);
+			return response;
+        }
+        catch (NoSuchElementException ex)
+        {
+            //error happened in readmetadata?.
+			//return empty json array;
+			JsonObject response = new JsonObject();
+			response.add("ret", ret);
+			return response;
+        }
+        catch (Exception e)
+        {
+            //error happened in ????
+			//return empty json array;
+			JsonObject response = new JsonObject();
+			response.add("ret", ret);
+			return response;
+        }
+    }
+
+    private CatalogPage getCatalogPage(int pageNumber)
+    {
+    	String TAG = "getCatalogPage";
+
+    	try{
+    		//Remote Input File Stream
+		    RemoteInputFileStream dataraw = this.read("music.json", pageNumber);
+		    System.out.println("\t"+ TAG+":connecting."); // DEBUG
+		    dataraw.connect();
+
+		    //Scanner
+		    System.out.println("\t" + TAG+":scanning."); // DEBUG
+		    Scanner scan = new Scanner(dataraw);
+		    scan.useDelimiter("\\A");
+		    String data = scan.next();
+		    System.out.println(data); // DEBUG
+
+		    //Convert from json to ArrayList
+		    System.out.println("\t" + TAG + ":converting json to CatalogPage.");
+		    CatalogPage page = new CatalogPage();
+		    Gson gson = new Gson();
+		    page = gson.fromJson(data, CatalogPage.class);
+
+		    System.out.println("\t" + TAG + ":Read Complete.");
+		    return page;
+    	}catch(Exception e)
+    	{
+    		return new CatalogPage();
+    	}
+
+    }
     
 	 /**
 	 * Add a page to the file                
 	  *
-	 * @param filename Name of the file
+	 * @param fileName Name of the file
 	 * @param data RemoteInputStream. 
 	 */
-    public void append(String filename, RemoteInputFileStream data) throws Exception
+    public void append(String fileName, RemoteInputFileStream data) throws Exception
     {
     	//appending? mp3? or music.json CatalogItem?
 
