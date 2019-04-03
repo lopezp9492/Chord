@@ -2,6 +2,8 @@
 import java.io.*;
 import java.util.*;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 
 public class DFSCommand
 {
@@ -51,8 +53,8 @@ public class DFSCommand
 
             if (result[0].equals("list"))
             {
-                    System.out.println("List of files: ");
-                    System.out.println(dfs.lists());
+                System.out.println("List of files: ");
+                System.out.println(dfs.lists());
             }
 
             if (result[0].equals("delete"))
@@ -70,7 +72,9 @@ public class DFSCommand
                 if(result.length > 1)
                 {
                     pageNumber = Integer.parseInt(result[1]);
+
                 } 
+                System.out.println("reading page #" + pageNumber);
 
                 //Remote Input File Stream
                 RemoteInputFileStream dataraw = dfs.read("music.json", pageNumber);
@@ -82,7 +86,7 @@ public class DFSCommand
                 Scanner scan = new Scanner(dataraw);
                 scan.useDelimiter("\\A");
                 String data = scan.next();
-                System.out.println(data); // DEBUG
+                //System.out.println(data); // DEBUG
 
                 //Convert from json to ArrayList
                 System.out.println("\t" + TAG + ":converting json to CatalogPage.");
@@ -92,13 +96,43 @@ public class DFSCommand
 
                 System.out.println("\t" + TAG + ":Read Complete.");
 
+                //DEBUG
+                //print each catalogItem song.title
+                for(int i = 0 ; i < page.size(); i++)
+                {
+                    System.out.println("\t\t" + page.getItem(i).song.title);
+                }
+                System.out.println(":Print Complete.");
+
+
             }
             if(result[0].equals("search"))
             {
                 String filter = "hello";
-                int count = 20;
+                int count = 5;
 
-                dfs.search(filter, count);
+                //If filter specified update filter
+                if(result.length > 1)
+                {
+                    filter = result[1];
+                } 
+                //If count specified update count
+                if(result.length > 2)
+                {
+                    filter = result[2];
+                } 
+                System.out.println("Searching...");
+                System.out.println("filter: " + filter);
+                System.out.println("count: " + count);
+
+                JsonObject jo = dfs.search(filter, count);
+
+
+                Gson gson = new Gson();
+                String jsonString = gson.toJson(jo);
+                System.out.println(jsonString);
+
+                System.out.println("search complete.");
             }
 
             if(result[0].equals("quit"))
@@ -132,9 +166,6 @@ public class DFSCommand
         System.out.println("\tsearch (filter, count)(\"name or artist or album\" , count)");
 
         System.out.println("\t");
-
-
-
         System.out.println("\tquit (freezes?)");
     }
 
