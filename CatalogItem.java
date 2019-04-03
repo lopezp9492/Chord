@@ -1,6 +1,8 @@
 //package MusicMetadata;
 
 import java.util.Comparator;
+import com.google.gson.JsonObject;
+
 
 public class CatalogItem {
 	public Release release;
@@ -50,4 +52,36 @@ public class CatalogItem {
 	   //descending order
 	   //return SongName2.compareTo(SongName1);
     }};
+
+    public boolean passesFilter(String filter)
+    {
+		//String id = this.song.id;
+		String title = this.song.title;
+		String album = this.release.name;
+		String artist = this.artist.name;
+
+		if (filter != null && filter.length() > 0) 
+		{
+			
+			// Skip song if filter keyword is not found in 
+			// title or artist or album
+			if (title.toLowerCase().indexOf(filter) < 0 && artist.toLowerCase().indexOf(filter) < 0
+					&& album.toLowerCase().indexOf(filter) < 0) 
+			{
+				return false;
+			}
+
+		}
+		return true;
+    }
+
+    public JsonObject getJson()
+    {
+		JsonObject song = new JsonObject();
+		song.addProperty("id", this.song.id);
+		song.addProperty("title", this.song.title);
+		song.addProperty("album", this.release.name);
+		song.addProperty("artist", this.artist.name);
+		return song;
+    }
 }
