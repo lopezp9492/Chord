@@ -93,6 +93,14 @@ public class DFSCommand
                 System.out.println("\t" + TAG + ":Read Complete.");
 
             }
+            if(result[0].equals("search"))
+            {
+                String filter = "hello";
+                int count = 20;
+
+                dfs.search(filter, count);
+            }
+
             if(result[0].equals("quit"))
             {
                 System.out.println("stoping...");
@@ -121,7 +129,9 @@ public class DFSCommand
         System.out.println("\tmove   (not implemented)");
         System.out.println("\tappend (not implemented)");
 
-        System.out.println("\tgetID  ()");
+        System.out.println("\tsearch (filter, count)(\"name or artist or album\" , count)");
+
+        System.out.println("\t");
 
 
 
