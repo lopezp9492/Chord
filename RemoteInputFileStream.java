@@ -121,7 +121,7 @@ public class RemoteInputFileStream extends InputStream implements Serializable {
                 try
                 {
                     //System.out.println("\n\t" + TAG + ".getBuff()");
-                    Thread.sleep(340);
+                    Thread.sleep(350);
                     input.read(nextBuf);
                     sem.release();
        //             System.out.println("Read buffer");
