@@ -637,7 +637,7 @@ public class DFS
 	    	int songs_found = 0;
 
 			//search page by page in music.json
-	    	System.out.println(TAG + "searching pages..."); // DEBUG
+	    	System.out.println(TAG + ": searching pages..."); // DEBUG
 			for(int index = 0 ; index < file.getNumberOfPages(); index++)
 			{
 	    		System.out.println("\tpage: " + index); // DEBUG
