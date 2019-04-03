@@ -585,8 +585,8 @@ public class DFS
 
      	//Debug 
      	String TAG = "read";
-     	System.out.println(TAG + "(fileName, pageNumber)");
-     	System.out.println(TAG + "(" + fileName + ", " + pageNumber);
+     	//System.out.println(TAG + "(fileName, pageNumber)");
+     	//System.out.println(TAG + "(" + fileName + ", " + pageNumber + ")");
 
     	//Read Metadata 
     	FilesJson metadata = readMetaData();
@@ -597,15 +597,15 @@ public class DFS
     	for(int i = 0; i < metadata.size(); i++)
 		{
 			FileJson filejson = metadata.getFile(i);
-			System.out.println("filejson.getName: " + filejson.getName()+")"); // DEBUG
+			//System.out.println("\tfilejson.getName: " + filejson.getName()); // DEBUG
 
 			//if x.getName == filename
 			if(filejson.getName().equals(fileName) )
 			{
-				System.out.println("name matched"); // DEBUG
+				//System.out.println("name matched"); // DEBUG
 				//get guid of page with "pageNumber"
 				guid = filejson.getPage(pageNumber).getGUID();
-				System.out.println("guid retrieved"); // DEBUG
+				//System.out.println("guid retrieved"); // DEBUG
 				break;
 			}
 		}
@@ -616,30 +616,39 @@ public class DFS
 
     public JsonObject search(String filter, int count)
     {
+    	String TAG = "search"; // DEBUG
+
     	//return variable
 		JsonArray ret = new JsonArray();
 
-
     	//Get Metadata
     	try{
+    		// Read metadata
+    		System.out.println(TAG + ": read metadata"); // DEBUG
 	    	FilesJson files = readMetaData();
 
-	    	//Find music.json in metadata
+	    	// Find music.json in metadata
+	    	System.out.println(TAG + ": Find music.json in metadata"); // DEBUG
     		FileJson file = files.getFile(0);
+    		System.out.println(TAG + ": file.getNumberOfPages(): "  + file.getNumberOfPages() ); // DEBUG
+
 
 	    	//Find count number of songs
 	    	int songs_found = 0;
 
 			//search page by page in music.json
-			for(int index = 0 ; index < file.getSize(); index++)
+	    	System.out.println(TAG + "searching pages..."); // DEBUG
+			for(int index = 0 ; index < file.getNumberOfPages(); index++)
 			{
+	    		System.out.println("\tpage: " + index); // DEBUG
+
 				//request page
-				CatalogPage catalogpage = getCatalogPage(index);
+				CatalogPage catalogpage = getCatalogPage(index);// TODO: replace with direct reference
 
 				//search each item in the catalogpage
 				for(int j = 0 ; j < catalogpage.size(); j++)
 				{
-					CatalogItem ci = catalogpage.getItem(j);
+					CatalogItem ci = catalogpage.getItem(j);//TODO: replace by direct reference?
 
 					//if item passes filter
 					if(ci.passesFilter(filter))
@@ -647,9 +656,12 @@ public class DFS
 						//add to response
 						ret.add(ci.getJson());
 
-						songs_found++;
+						songs_found = songs_found+1;
+
 						if(songs_found >= count)
 						{
+							System.out.println("max matches found.");
+							System.out.println("\tmatches found: " + songs_found);
 							JsonObject response = new JsonObject();
 							response.add("ret", ret);
 							return response;
@@ -659,7 +671,9 @@ public class DFS
 				}
 			}
 			//searched all pages.
-			//return empty json array;
+			//return json array;
+			System.out.println("Searched all pages");
+			System.out.println("\tmatches found: " + songs_found);
 			JsonObject response = new JsonObject();
 			response.add("ret", ret);
 			return response;
@@ -668,14 +682,6 @@ public class DFS
             e.printStackTrace();
 
 			//error happened in readmetadata?.
-			//return empty json array;
-			JsonObject response = new JsonObject();
-			response.add("ret", ret);
-			return response;
-        }
-        catch (NoSuchElementException ex)
-        {
-            //error happened in readmetadata?.
 			//return empty json array;
 			JsonObject response = new JsonObject();
 			response.add("ret", ret);
@@ -691,30 +697,33 @@ public class DFS
         }
     }
 
-    private CatalogPage getCatalogPage(int pageNumber)
+    public CatalogPage getCatalogPage(int pageNumber)
     {
     	String TAG = "getCatalogPage";
+		//System.out.println(TAG + "(pageNumber)" ); // DEBUG
+		//System.out.println(TAG + "("+ pageNumber + ")" ); // DEBUG
 
     	try{
     		//Remote Input File Stream
 		    RemoteInputFileStream dataraw = this.read("music.json", pageNumber);
-		    System.out.println("\t"+ TAG+":connecting."); // DEBUG
+		    //System.out.println("\t"+ TAG+":connecting."); // DEBUG
 		    dataraw.connect();
 
 		    //Scanner
-		    System.out.println("\t" + TAG+":scanning."); // DEBUG
+		    //System.out.println("\t" + TAG+":scanning."); // DEBUG
 		    Scanner scan = new Scanner(dataraw);
 		    scan.useDelimiter("\\A");
 		    String data = scan.next();
-		    System.out.println(data); // DEBUG
+		    //System.out.println(data); // DEBUG
 
 		    //Convert from json to ArrayList
-		    System.out.println("\t" + TAG + ":converting json to CatalogPage.");
+		    //System.out.println("\t" + TAG + ":converting json to CatalogPage.");
 		    CatalogPage page = new CatalogPage();
 		    Gson gson = new Gson();
 		    page = gson.fromJson(data, CatalogPage.class);
 
-		    System.out.println("\t" + TAG + ":Read Complete.");
+		    //System.out.println("\t" + TAG + ":Read Complete.");
+		    //System.out.println("\t page.size(): " + page.size());
 		    return page;
     	}catch(Exception e)
     	{
