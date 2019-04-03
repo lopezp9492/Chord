@@ -119,7 +119,7 @@ public class DFSCommand
                 //If count specified update count
                 if(result.length > 2)
                 {
-                    filter = result[2];
+                    count = Integer.parseInt(result[2]);
                 } 
                 System.out.println("Searching...");
                 System.out.println("filter: " + filter);
