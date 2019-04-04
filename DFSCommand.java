@@ -75,6 +75,7 @@ public class DFSCommand
 
                 } 
                 System.out.println("reading page #" + pageNumber);
+                Long startTime = System.currentTimeMillis();
 
                 //Remote Input File Stream
                 RemoteInputFileStream dataraw = dfs.read("music.json", pageNumber);
@@ -94,7 +95,12 @@ public class DFSCommand
                 Gson gson = new Gson();
                 page = gson.fromJson(data, CatalogPage.class);
 
+                Long endTime = System.currentTimeMillis();
+                Long runTime = (endTime-startTime);
+
                 System.out.println("\t" + TAG + ":Read Complete.");
+                System.out.println("\t" + TAG + ":runTime: " + runTime);
+
 
                 //DEBUG
                 //print each catalogItem song.title
@@ -103,6 +109,8 @@ public class DFSCommand
                     System.out.println("\t\t" + page.getItem(i).song.title);
                 }
                 System.out.println(":Print Complete.");
+                System.out.println("\t" + TAG + ":runTime: " + runTime);
+
 
 
             }
@@ -125,7 +133,10 @@ public class DFSCommand
                 System.out.println("filter: " + filter);
                 System.out.println("count: " + count);
 
+                Long startTime = System.currentTimeMillis();
                 JsonObject jo = dfs.search(filter, count);
+                Long endTime = System.currentTimeMillis();
+                Long runTime = endTime-startTime;
 
 
                 Gson gson = new Gson();
@@ -133,6 +144,8 @@ public class DFSCommand
                 System.out.println(jsonString);
 
                 System.out.println("search complete.");
+                System.out.println("runTime: "+ runTime);
+
             }
 
             if(result[0].equals("quit"))
