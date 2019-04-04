@@ -219,17 +219,21 @@ public class DFS
     //END HELPER CLASSES---------------------------------------
     
     //DFS Variables
+    int port;                               //
+    Chord  chord;                           // 
+    ArrayList<CatalogItem> catalogItems;    // Used in function loadCatalog().
+    FilesJson local_metadata;               // Used to reduce the number of times that metadata is requested from chord.
+    Long expiration = (long) 10000;         // If the metadata is older then the expiration time it gets reloaded at the next search request.
+    Long metadataTimeStamp = (long) 0;      // Time when metadata was read from the chord. 
+                                            // Initial time is zero to ensure it gets updated the first time its requested. 
 
-    ArrayList<CatalogItem> catalogItems;
-    int port;
-    Chord  chord;
     
     //END DFS Variables
     
     public DFS(int port) throws Exception
     {
         catalogItems = new ArrayList<CatalogItem>();
-
+        local_metadata = new FilesJson();
         
         this.port = port;
         long guid = md5("" + port);
@@ -281,9 +285,22 @@ public class DFS
     public FilesJson readMetaData() throws Exception
     {
         //DEBUG
-        //
         String TAG = "readMetaData";
         //System.out.println(TAG+"()");
+
+        Long currentTime = System.currentTimeMillis();
+
+        //if metadata is not too old return itself ie: do not change
+        Long difference = currentTime-metadataTimeStamp;
+        //System.out.println(TAG + "(): time difference = " + difference); // DEBUG
+        if((currentTime-metadataTimeStamp) < expiration)
+        {
+            //System.out.println(TAG+"(): metadata has not expired"); // DEBUG
+            return local_metadata;
+        }
+        //else metadata is too old, refresh it.
+        //System.out.println(TAG+"(): refresshing metadata"); // DEBUG
+        metadataTimeStamp = System.currentTimeMillis(); //update timestamp
 
         FilesJson filesJson = null;
         try {
@@ -302,6 +319,7 @@ public class DFS
         {
             filesJson = new FilesJson();
         }
+        local_metadata = filesJson;
         return filesJson;
     }
     
@@ -311,6 +329,7 @@ public class DFS
 	 */
     public void writeMetaData(FilesJson filesJson) throws Exception
     {
+        metadataTimeStamp = (long)0; //zero to make system refresh metadata
         long guid = md5("Metadata");
         ChordMessageInterface peer = chord.locateSuccessor(guid);
         System.out.println("\tSaving Metadata to peer: " + peer.getId()); // DEBUG
@@ -539,7 +558,7 @@ public class DFS
     		if(metadata.getFile(i).getName().equals(fileName))
     		{
     			file = metadata.getFile(i);
-    			System.out.println(TAG+": file size: " + file.getSize()); // DEBUG
+    			//System.out.println(TAG+": file size: " + file.getSize()); // DEBUG
     			System.out.println(TAG+": numberOfPages: " + file.getNumberOfPages()); // DEBUG
 
 
@@ -574,14 +593,13 @@ public class DFS
     public RemoteInputFileStream read(String fileName, int pageNumber) throws Exception
     {
     	//TODO: 
-    	//TEST different pageNumbers
-
 
     	//DONE:
      	//Read metadata
      	//find filename in metadata
      	//find guid of pageNumber in metadata
      	//request page 
+        //TEST different pageNumbers
 
      	//Debug 
      	String TAG = "read";
@@ -593,7 +611,6 @@ public class DFS
     	long guid = (long) 0;
 
     	//Find File in metadata
-    	//for(FileJson filejson : metadata)
     	for(int i = 0; i < metadata.size(); i++)
 		{
 			FileJson filejson = metadata.getFile(i);
@@ -616,7 +633,11 @@ public class DFS
 
     public JsonObject search(String filter, int count)
     {
-    	String TAG = "search"; // DEBUG
+    	String TAG = "search";      // DEBUG
+        Long startTime = (long)0;   // DEBUG
+        Long endTime =  (long)0;    // DEBUG
+        Long runTime = (long)0;     // DEBUG
+        ArrayList<Long> getCatalogTimes = new ArrayList<Long>(); // DEBUG
 
     	//return variable
 		JsonArray ret = new JsonArray();
@@ -633,33 +654,50 @@ public class DFS
     		System.out.println(TAG + ": file.getNumberOfPages(): "  + file.getNumberOfPages() ); // DEBUG
 
 
-	    	//Find count number of songs
+	    	// Count number of songs
 	    	int songs_found = 0;
 
 			//search page by page in music.json
 	    	System.out.println(TAG + ": searching pages..."); // DEBUG
 			for(int index = 0 ; index < file.getNumberOfPages(); index++)
 			{
-	    		System.out.println("\tpage: " + index); // DEBUG
+	    		//System.out.println("\tpage: " + index); // DEBUG
 
 				//request page
-				CatalogPage catalogpage = getCatalogPage(index);// TODO: replace with direct reference
+				//CatalogPage catalogpage = getCatalogPage(index);// TODO: replace with direct reference
+                startTime = System.currentTimeMillis(); // DEBUG
+                CatalogPage catalogpage = getCatalogPage(index);// TODO: replace with direct reference
+                endTime = System.currentTimeMillis(); // DEBUG
+                runTime = endTime-startTime;
+                getCatalogTimes.add(runTime);
 
 				//search each item in the catalogpage
 				for(int j = 0 ; j < catalogpage.size(); j++)
 				{
-					CatalogItem ci = catalogpage.getItem(j);//TODO: replace by direct reference?
+					//CatalogItem ci = catalogpage.getItem(j);//TODO: replace by direct reference?
 
 					//if item passes filter
-					if(ci.passesFilter(filter))
+					//if(ci.passesFilter(filter))
+                    if(catalogpage.getItem(j).passesFilter(filter))
 					{
 						//add to response
-						ret.add(ci.getJson());
+						//ret.add(ci.getJson());
+                        ret.add(catalogpage.getItem(j).getJson());
 
 						songs_found = songs_found+1;
+                        //System.out.println("\t\tsearch page: " + index); // DEBUG
+                        System.out.println("\t\tfound so far: " + songs_found); // DEBUG
 
 						if(songs_found >= count)
-						{
+						{        
+                            //DEBUG
+                            Long sum = (long)0;
+                            for(int i = 0 ; i <getCatalogTimes.size(); i++)
+                            {
+                                sum = sum + getCatalogTimes.get(i);
+                            }
+                            Long average = sum/(long)getCatalogTimes.size();
+                            System.out.println("Average page request: " + average);
 							System.out.println("max matches found.");
 							System.out.println("\tmatches found: " + songs_found);
 							JsonObject response = new JsonObject();
@@ -672,6 +710,14 @@ public class DFS
 			}
 			//searched all pages.
 			//return json array;
+            //DEBUG
+            Long sum = (long)0;
+            for(int i = 0 ; i <getCatalogTimes.size(); i++)
+            {
+                sum = sum + getCatalogTimes.get(i);
+            }
+            Long average = sum/(long)getCatalogTimes.size();
+            System.out.println("Average page request: " + average);
 			System.out.println("Searched all pages");
 			System.out.println("\tmatches found: " + songs_found);
 			JsonObject response = new JsonObject();
@@ -697,7 +743,8 @@ public class DFS
         }
     }
 
-    public CatalogPage getCatalogPage(int pageNumber)
+    public CatalogPage getCatalogPage(int pageNumber)//TODO GET DIRECT REFERENCE 
+    //public void getCatalogPage(CatalogPage catalogPage, int pageNumber)//TODO USE THIS LINE
     {
     	String TAG = "getCatalogPage";
 		//System.out.println(TAG + "(pageNumber)" ); // DEBUG
