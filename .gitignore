@@ -26,3 +26,4 @@ $RECYCLE.BIN/
 images/**
 old_commands/**
 **/repository/**
+*.log
