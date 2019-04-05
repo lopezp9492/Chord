@@ -24,6 +24,7 @@ public class RemoteInputFileStream extends InputStream implements Serializable {
     public InputStream input;
     public Semaphore sem;
     private static int BUFFER_LENGTH = 2 << 15;
+    private int sleepTime;
     /**
      * It stores a buffer with FRAGMENT_SIZE bytes for the current reading.
      * This variable is useful for UDP sockets. Thus bur is the datagram
@@ -39,11 +40,20 @@ public class RemoteInputFileStream extends InputStream implements Serializable {
      */
     protected int fragment = 0;
 
-/**
+    /**
  * Connects to the server to provide the file
  */
     public void connect()
     {
+      this.connect(this.sleepTime);
+    }
+
+/**
+ * Connects to the server to provide the file
+ */
+    public void connect(int sleepTime)
+    {
+        this.sleepTime = sleepTime;
         this.buf  = new byte[BUFFER_LENGTH];
         this.nextBuf  = new byte[BUFFER_LENGTH];
         pos = 0;
@@ -53,7 +63,7 @@ public class RemoteInputFileStream extends InputStream implements Serializable {
             input = socket.getInputStream();
             sem = new Semaphore(1);
             sem.acquire();
-            getBuff(fragment);
+            getBuff(fragment, sleepTime);
             fragment++;
         } catch (Exception exc) {
             System.out.println(exc);
@@ -61,7 +71,7 @@ public class RemoteInputFileStream extends InputStream implements Serializable {
     }
 
     public  RemoteInputFileStream()  throws FileNotFoundException {
-
+      this.sleepTime = 500;
 
     }
 
@@ -74,6 +84,7 @@ public class RemoteInputFileStream extends InputStream implements Serializable {
         File file = new File(pathName);
         total = (int)file.length();
         pos = 0;
+        this.sleepTime = 500;
 
         try
         {
@@ -113,15 +124,22 @@ public class RemoteInputFileStream extends InputStream implements Serializable {
      * getNextBuff reads the buffer. It gets the data using
      * the remote method getSongChunk
     */
-    protected void getBuff(int fragment) throws IOException
+    protected void getBuff(int fragment, int sleepTime) throws IOException
     {
         new Thread()
         {
             public void run() {
                 try
                 {
-                    //System.out.println("\n\t" + TAG + ".getBuff()");
-                    Thread.sleep(350);
+                    // DEBUG
+                    if(sleepTime > 0)
+                    {
+                      //System.out.println("\n\t" + TAG + ".getBuff()");            // DEBUG
+                      System.out.println("\t" + TAG + ": sleepTime: " + sleepTime); // DEBUG
+                      Thread.sleep(sleepTime); // The Fix
+                    }
+
+
                     input.read(nextBuf);
                     sem.release();
        //             System.out.println("Read buffer");
@@ -162,7 +180,7 @@ public class RemoteInputFileStream extends InputStream implements Serializable {
 	      for (int i=0; i< BUFFER_LENGTH; i++)
 		      buf[i] = nextBuf[i];
 
-	      getBuff(fragment);
+	      getBuff(fragment, this.sleepTime);
 	      fragment++;
 	  }
 	  int p = pos % BUFFER_LENGTH;
