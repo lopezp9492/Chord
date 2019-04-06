@@ -37,6 +37,26 @@ public class CatalogPage
      {
         return items.size();
      }
+     //returns the first letter of the first item
+     public String getFirstLetter()
+     {
+        switch(order)
+            {
+            case byArtist:
+                return items.get(0).getArtist().substring(0,0);
+                break;
+            case byAlbum:
+                return items.get(0).getAlbum().substring(0,0);
+                break;
+            case bySong:
+                return items.get(0).getTitle().substring(0,0);
+                break;
+            default:
+                //System.out.println("Unsorted: " + items.get(i).artist.name);
+                return "?";
+                break;
+            }
+     }
 
     // setters-------------------------------
      public void addItem(CatalogItem item)
