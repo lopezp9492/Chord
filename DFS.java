@@ -28,11 +28,13 @@ import com.google.gson.JsonObject;
             "guid":11,
             "size":64000000
             "letter":"A"
+            "last_letter"B"
          },
          {
             "guid":13,
             "size":64000000
             "letter":"B"
+            "last_letter"C"
          }
       ]
       }
@@ -51,6 +53,8 @@ public class DFS
         Long guid;
         int size;
         String letter;
+        String last_letter;
+
 
         public PagesJson()
         {
@@ -74,6 +78,11 @@ public class DFS
             return this.letter;
         }
 
+        public String getLastLetter()
+        {
+            return this.last_letter;
+        }
+
         // setters
         public void setGUID(Long guid)
         {
@@ -86,6 +95,10 @@ public class DFS
         public void setLetter(String l)
         {
             this.letter = l;
+        }
+        public void setLastLetter(String l)
+        {
+            this.last_letter = l;
         }
 
     };
@@ -437,14 +450,15 @@ public class DFS
         System.out.println("createIndex(" + fileName + ")");
 
 
-        String path = "./catalogs/" + fileName;
+        //String path = "./catalogs/" + fileName;
         CatalogPage catalog = new CatalogPage();
-        
+
         //catalog.loadCatalog(path); //use this if reading music.json.
-        catalog.readJsonFile(path);  //use this if a dorted catalog.
+        catalog.readJsonFile(fileName);  //use this if a dorted catalog.
 
         //Page Data
         CatalogPage page = new CatalogPage();
+        page.setOrder(fileName);
 
         //Metadata
         FileJson file = new FileJson();  
@@ -481,9 +495,10 @@ public class DFS
                 // Save page at its corresponding node
                 writePageData(page, guid);
 
-                //reset page
-                page = new CatalogPage();
-                page_size = 0; // metadata
+                //reset page 
+                page = new CatalogPage();   // metadata
+                page.setOrder(fileName);    // metadata
+                page_size = 0;              // metadata
             }
             //Save Last Page if its smaller than "items_per_page"
             else if(i == catalogItems.size()-1 )

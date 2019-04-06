@@ -37,18 +37,45 @@ public class CatalogPage
      {
         return items.size();
      }
+
      //returns the first letter of the first item
      public String getFirstLetter()
      {
+        System.out.println("order: " + this.order);
         switch(order)
             {
             case byArtist:
-                return items.get(0).getArtist().substring(0,0);
+                System.out.println("\treturning: " + items.get(0).getArtist().substring(0,1));
+                return items.get(0).getArtist().substring(0,1);
             case byAlbum:
-                return items.get(0).getAlbum().substring(0,0);
+                System.out.println("\treturning: " + items.get(0).getAlbum().substring(0,1));
+                return items.get(0).getAlbum().substring(0,1);
             case bySong:
-                return items.get(0).getTitle().substring(0,0);
+                System.out.println("\treturning: " + items.get(0).getTitle().substring(0,1));
+                return items.get(0).getTitle().substring(0,1);
             default:
+                System.out.println("\treturning: unsorted");
+                //System.out.println("Unsorted: " + items.get(i).artist.name);
+                return "?";
+            }
+     }
+
+     public String getLastLetter()
+     {
+        //System.out.println("order: " + this.order);
+        switch(order)
+            {
+            case byArtist:
+                //System.out.println("\treturning: " + items.get(0).getArtist().substring(0,1));
+                return items.get(items.size()-1).getArtist().substring(0,1);
+            case byAlbum:
+                //System.out.println("\treturning: " + items.get(0).getAlbum().substring(0,1));
+                return items.get(items.size()-1).getAlbum().substring(0,1);
+            case bySong:
+                //System.out.println("\treturning: " + items.get(0).getTitle().substring(0,1));
+                return items.get(items.size()-1).getTitle().substring(0,1);
+            default:
+                //System.out.println("\treturning: unsorted");
                 //System.out.println("Unsorted: " + items.get(i).artist.name);
                 return "?";
             }
@@ -108,13 +135,18 @@ public class CatalogPage
     }
     
     // Read simplified catalog
+    //fileName is the name of a sorted file located in the catalogs folder
     public void readJsonFile(String fileName)
     {
+        System.out.println("readJsonFile: fileName = " + fileName);
+
         String TAG = "readJsonFile";
-        
-        //read peer.get
+
+        String path = "./catalogs/" + fileName;
+
+        //read local file
         try {
-             FileInputStream dataraw = new FileInputStream(fileName);
+             FileInputStream dataraw = new FileInputStream(path);
             
              System.out.println("\t" + TAG+": scanning."); // DEBUG
              Scanner scan = new Scanner(dataraw);
@@ -143,19 +175,25 @@ public class CatalogPage
 
     public void setOrder(String fileName)
     {
+        System.out.println("setOrder: fileName = " + fileName);
+
         //Set Order 
         switch (fileName)
         {
             case "artist.json":
+                System.out.println("setOrder: byArtist");
                 this.order = Order.byArtist;
                 break;
             case "album.json":
+                System.out.println("setOrder: byAlbum");
                 this.order = Order.byAlbum;
                 break;
             case "songs.json":
+                System.out.println("setOrder: bySong");
                 this.order = Order.bySong;
                 break;
             default:
+                System.out.println("setOrder: UNSORTED");
                 this.order = Order.UNSORTED;
             break;
         }
