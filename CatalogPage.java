@@ -44,17 +44,13 @@ public class CatalogPage
             {
             case byArtist:
                 return items.get(0).getArtist().substring(0,0);
-                break;
             case byAlbum:
                 return items.get(0).getAlbum().substring(0,0);
-                break;
             case bySong:
                 return items.get(0).getTitle().substring(0,0);
-                break;
             default:
                 //System.out.println("Unsorted: " + items.get(i).artist.name);
                 return "?";
-                break;
             }
      }
 
@@ -141,6 +137,28 @@ public class CatalogPage
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+
+        setOrder(fileName);
+    }
+
+    public void setOrder(String fileName)
+    {
+        //Set Order 
+        switch (fileName)
+        {
+            case "artist.json"
+                this.order = byArtist;
+                break;
+            case "album.json"
+                this.order = byAlbum;
+                break;
+            case "songs.json"
+                this.order = bySong;
+                break;
+            default:
+                this.order = UNSORTED;
+            break;
+        }
     }
     
     // loads the original music.json file that has Professor Ponce's Format
@@ -166,7 +184,9 @@ public class CatalogPage
             e.printStackTrace();
         }
     }
-    
+
+    // PRINT --------------------------------------------------
+
     public void println()
     {
         this.println(items.size());
