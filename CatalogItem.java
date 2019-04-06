@@ -53,6 +53,7 @@ public class CatalogItem {
 	   //return SongName2.compareTo(SongName1);
     }};
 
+    //returns true if the filter keyword is contained in the title, album or artist name
     public boolean passesFilter(String filter)
     {
 		//String id = this.song.id;
@@ -63,14 +64,13 @@ public class CatalogItem {
 		if (filter != null && filter.length() > 0) 
 		{
 			
-			// Skip song if filter keyword is not found in 
+			// return false if filter keyword is not found in the 
 			// title or artist or album
 			if (title.toLowerCase().indexOf(filter) < 0 && artist.toLowerCase().indexOf(filter) < 0
 					&& album.toLowerCase().indexOf(filter) < 0) 
 			{
 				return false;
 			}
-
 		}
 		return true;
     }
@@ -84,4 +84,17 @@ public class CatalogItem {
 		song.addProperty("artist", this.artist.name);
 		return song;
     }
+
+    public String getTitle()
+    {
+    	return this.song.title;
+    }
+    public String getAlbum()
+    {
+    	return this.release.name;
+    }
+    public String getArtist()
+    {
+    	return this.artist.name;
+    } 
 }
