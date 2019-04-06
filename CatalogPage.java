@@ -60,6 +60,7 @@ public class CatalogPage
             }
      }
 
+     //returns the first letter of the last item
      public String getLastLetter()
      {
         //System.out.println("order: " + this.order);
