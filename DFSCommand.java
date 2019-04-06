@@ -51,6 +51,12 @@ public class DFSCommand
                 initialized = true;
             }
 
+            //
+            if (result[0].equals("ci"))//createIndex
+            {
+                dfs.createIndex();
+            }
+
             if (result[0].equals("list"))
             {
                 System.out.println("List of files: ");
@@ -59,7 +65,17 @@ public class DFSCommand
 
             if (result[0].equals("delete"))
             {
-                dfs.delete("music.json");
+
+                String file_to_delete = "?";
+                if(result.length > 1)
+                {
+                    file_to_delete = result[1];
+                    dfs.delete(file_to_delete);
+                } 
+                else
+                {
+                    dfs.delete("music.json");
+                }
             }
 
             if(result[0].equals("read"))
@@ -80,9 +96,11 @@ public class DFSCommand
                 //Remote Input File Stream
                 RemoteInputFileStream dataraw = dfs.read("music.json", pageNumber);
                 System.out.println("\t"+ TAG+":connecting."); // DEBUG
-                dataraw.connect();
+                dataraw.connect(350);
 
                 //Scanner
+                CatalogPage page = new CatalogPage();
+                //try{
                 System.out.println("\t" + TAG+":scanning."); // DEBUG
                 Scanner scan = new Scanner(dataraw);
                 scan.useDelimiter("\\A");
@@ -91,9 +109,15 @@ public class DFSCommand
 
                 //Convert from json to ArrayList
                 System.out.println("\t" + TAG + ":converting json to CatalogPage.");
-                CatalogPage page = new CatalogPage();
+                //CatalogPage page = new CatalogPage();
                 Gson gson = new Gson();
-                page = gson.fromJson(data, CatalogPage.class);
+                try{
+                    page = gson.fromJson(data, CatalogPage.class);
+
+                }catch(com.google.gson.JsonSyntaxException e)
+                {
+                    System.out.println("JsonSyntaxException: not enough time to read buffer.");
+                }
 
                 Long endTime = System.currentTimeMillis();
                 Long runTime = (endTime-startTime);
@@ -108,7 +132,7 @@ public class DFSCommand
                 {
                     System.out.println("\t\t" + page.getItem(i).song.title);
                 }
-                System.out.println(":Print Complete.");
+                System.out.println("\t" + TAG + ":Print Complete.");
                 System.out.println("\t" + TAG + ":runTime: " + runTime);
 
 
@@ -116,8 +140,8 @@ public class DFSCommand
             }
             if(result[0].equals("search"))
             {
-                String filter = "hello";
-                int count = 5;
+                String filter = "happy";
+                int count = 20;
 
                 //If filter specified update filter
                 if(result.length > 1)
