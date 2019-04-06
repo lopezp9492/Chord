@@ -146,17 +146,17 @@ public class CatalogPage
         //Set Order 
         switch (fileName)
         {
-            case "artist.json"
-                this.order = byArtist;
+            case "artist.json":
+                this.order = Order.byArtist;
                 break;
-            case "album.json"
-                this.order = byAlbum;
+            case "album.json":
+                this.order = Order.byAlbum;
                 break;
-            case "songs.json"
-                this.order = bySong;
+            case "songs.json":
+                this.order = Order.bySong;
                 break;
             default:
-                this.order = UNSORTED;
+                this.order = Order.UNSORTED;
             break;
         }
     }
