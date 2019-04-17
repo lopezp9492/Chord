@@ -203,11 +203,14 @@ public class CatalogPage
     // loads the original music.json file that has Professor Ponce's Format
     public void loadCatalog(String fileName)
     {
+        String path = "./catalogs/" + fileName;
+
+        
         // Try to open the file for reading
         try {
             
             //JSON
-            JsonReader jsonReader = new JsonReader(new FileReader(fileName));
+            JsonReader jsonReader = new JsonReader(new FileReader(path));
             
             //GSON
             Gson gson = new Gson();
