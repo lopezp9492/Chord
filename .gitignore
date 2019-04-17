@@ -25,5 +25,6 @@ $RECYCLE.BIN/
 *.class
 images/**
 old_commands/**
+old_RemoteInputFileStream/**
 **/repository/**
 *.log
