@@ -4,7 +4,7 @@
 * The client must call connect() before reading
 *
 * @author  Oscar Morales-Ponce
-* @version 0.15
+* @version 0.16
 * @since   03-3-2019
 */
 
@@ -16,15 +16,13 @@ import java.util.concurrent.Semaphore;
 
 public class RemoteInputFileStream extends InputStream implements Serializable {
 
-    private String TAG = "RemoteInputFileStream";
     public InetAddress IP;
     public int port;
     public int total;
     public int pos;
     public InputStream input;
     public Semaphore sem;
-    private static int BUFFER_LENGTH = 2 << 15;
-    private int sleepTime;
+    private static int BUFFER_LENGTH = 1<< 16;
     /**
      * It stores a buffer with FRAGMENT_SIZE bytes for the current reading.
      * This variable is useful for UDP sockets. Thus bur is the datagram
@@ -40,21 +38,12 @@ public class RemoteInputFileStream extends InputStream implements Serializable {
      */
     protected int fragment = 0;
 
-    /**
+/**
  * Connects to the server to provide the file
  */
     public void connect()
     {
-      this.connect(this.sleepTime);
-    }
-
-/**
- * Connects to the server to provide the file
- */
-    public void connect(int sleepTime)
-    {
-        this.sleepTime = sleepTime;
-        this.buf  = new byte[BUFFER_LENGTH];
+        //this.buf  = new byte[BUFFER_LENGTH];
         this.nextBuf  = new byte[BUFFER_LENGTH];
         pos = 0;
         try
@@ -63,7 +52,7 @@ public class RemoteInputFileStream extends InputStream implements Serializable {
             input = socket.getInputStream();
             sem = new Semaphore(1);
             sem.acquire();
-            getBuff(fragment, sleepTime);
+            getBuff(fragment);
             fragment++;
         } catch (Exception exc) {
             System.out.println(exc);
@@ -71,7 +60,7 @@ public class RemoteInputFileStream extends InputStream implements Serializable {
     }
 
     public  RemoteInputFileStream()  throws FileNotFoundException {
-      this.sleepTime = 500;
+
 
     }
 
@@ -84,7 +73,6 @@ public class RemoteInputFileStream extends InputStream implements Serializable {
         File file = new File(pathName);
         total = (int)file.length();
         pos = 0;
-        this.sleepTime = 500;
 
         try
         {
@@ -98,8 +86,12 @@ public class RemoteInputFileStream extends InputStream implements Serializable {
                         Socket socket = serverSocket.accept();
                         OutputStream socketOutputStream = socket.getOutputStream();
                         FileInputStream is = new FileInputStream(pathName);
+                        byte[] b =new byte[BUFFER_LENGTH];
                         while (is.available() > 0)
-                            socketOutputStream.write(is.read());
+                        {
+                            is.read(b);
+                            socketOutputStream.write(b);
+                        }
                         is.close();
                         if (deleteAfter)
                         {
@@ -124,25 +116,24 @@ public class RemoteInputFileStream extends InputStream implements Serializable {
      * getNextBuff reads the buffer. It gets the data using
      * the remote method getSongChunk
     */
-    protected void getBuff(int fragment, int sleepTime) throws IOException
+    protected void getBuff(int fragment) throws IOException
     {
         new Thread()
         {
             public void run() {
                 try
                 {
-                    // DEBUG
-                    if(sleepTime > 0)
+                         
+                    while ((Math.floor(total/BUFFER_LENGTH) <= fragment || 
+                            input.available() < BUFFER_LENGTH) && 
+                          (Math.floor(total/BUFFER_LENGTH) > fragment || 
+                           (input.available() < total % BUFFER_LENGTH))) 
                     {
-                      //System.out.println("\n\t" + TAG + ".getBuff()");            // DEBUG
-                      System.out.println("\t" + TAG + ": sleepTime: " + sleepTime); // DEBUG
-                      Thread.sleep(sleepTime); // The Fix
-                    }
-
-
+            
+                        Thread.sleep(1);
+                     }
                     input.read(nextBuf);
                     sem.release();
-       //             System.out.println("Read buffer");
                 }
                 catch (Exception e)
                 {
@@ -177,10 +168,9 @@ public class RemoteInputFileStream extends InputStream implements Serializable {
           {
                 System.out.println(exc);
           }
-	      for (int i=0; i< BUFFER_LENGTH; i++)
-		      buf[i] = nextBuf[i];
+		  buf = nextBuf.clone();
 
-	      getBuff(fragment, this.sleepTime);
+	      getBuff(fragment);
 	      fragment++;
 	  }
 	  int p = pos % BUFFER_LENGTH;

@@ -47,8 +47,8 @@ public class DFSCommand
             //pedro
             if (result[0].equals("create"))
             {
-                dfs.create("music.json");
-                initialized = true;
+                //dfs.create("music.json");
+                //initialized = true;
             }
 
             //
@@ -96,7 +96,7 @@ public class DFSCommand
                 //Remote Input File Stream
                 RemoteInputFileStream dataraw = dfs.read("music.json", pageNumber);
                 System.out.println("\t"+ TAG+":connecting."); // DEBUG
-                dataraw.connect(350);
+                dataraw.connect(); //NEW RFIS
 
                 //Scanner
                 CatalogPage page = new CatalogPage();
@@ -158,7 +158,9 @@ public class DFSCommand
                 System.out.println("count: " + count);
 
                 Long startTime = System.currentTimeMillis();
-                JsonObject jo = dfs.search(filter, count);
+                //JsonObject jo = dfs.search(filter, count);
+                JsonObject jo = dfs.indexSearch(filter, count);
+
                 Long endTime = System.currentTimeMillis();
                 Long runTime = endTime-startTime;
 
