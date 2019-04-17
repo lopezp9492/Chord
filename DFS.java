@@ -255,8 +255,8 @@ public class DFS
     Long expiration = (long) 10000;         // If the metadata is older then the expiration time it gets reloaded at the next search request.
     Long metadataTimeStamp = (long) 0;      // Time when metadata was read from the chord. 
                                             // Initial time is zero to ensure it gets updated the first time its requested. 
-    int items_per_page = 50;
-    int sleepTime = 330;
+    int items_per_page = 1000;
+    int sleepTime = 500;
     
     //END DFS Variables
     
@@ -339,7 +339,7 @@ public class DFS
             long guid = md5("Metadata");
             ChordMessageInterface peer = chord.locateSuccessor(guid);
             RemoteInputFileStream metadataraw = peer.get(guid);
-            metadataraw.connect(readSleepTime);
+            metadataraw.connect(); // NEW RFIS
             Scanner scan = new Scanner(metadataraw);
             scan.useDelimiter("\\A");
             String strMetaData = scan.next();
@@ -450,11 +450,17 @@ public class DFS
         System.out.println("createIndex(" + fileName + ")");
 
 
-        //String path = "./catalogs/" + fileName;
         CatalogPage catalog = new CatalogPage();
 
-        //catalog.loadCatalog(path); //use this if reading music.json.
-        catalog.readJsonFile(fileName);  //use this if a dorted catalog.
+        if(fileName.equals("music.json"))
+        {
+            catalog.loadCatalog(fileName); //use this if reading music.json.
+        }
+        else
+        {
+            catalog.readJsonFile(fileName);  //use this if using a sorted catalog.
+        }
+
 
         //Page Data
         CatalogPage page = new CatalogPage();
@@ -540,6 +546,7 @@ public class DFS
 	  *
 	 * @param filename Name of the file
 	 */
+    /**
     public void create(String fileName) throws Exception
     {
 
@@ -636,7 +643,9 @@ public class DFS
         metadata.addFile(file);
         writeMetaData(metadata);
     }
+    **/
 
+    /**
     public void loadCatalog(String fileName)
     {
 
@@ -666,6 +675,7 @@ public class DFS
             e.printStackTrace();
         }
     }
+    **/
     
 	/**
 	 * delete file 
@@ -765,7 +775,13 @@ public class DFS
     }
 
     //TODO
-    //public JsonObject indexSearch(String filter, int count)
+    public JsonObject indexSearch(String filter, int count)
+    {
+            JsonObject response = new JsonObject();
+
+            return response;
+
+    }
 
     public JsonObject search(String filter, int count)
     {
@@ -811,7 +827,7 @@ public class DFS
                     //Remote Input File Stream
                     RemoteInputFileStream dataraw = this.read("music.json", index);//index = page number
                     //System.out.println("\t"+ TAG+":connecting."); // DEBUG
-                    dataraw.connect(this.sleepTime);
+                    dataraw.connect();// new RFIS
 
                     //Scanner
                     //System.out.println("\t" + TAG+":scanning."); // DEBUG
@@ -943,7 +959,7 @@ public class DFS
     		//Remote Input File Stream
 		    RemoteInputFileStream dataraw = this.read("music.json", pageNumber);
 		    //System.out.println("\t"+ TAG+":connecting."); // DEBUG
-		    dataraw.connect(this.sleepTime);
+		    dataraw.connect(); // NEW RFIS
 
 		    //Scanner
 		    //System.out.println("\t" + TAG+":scanning."); // DEBUG
