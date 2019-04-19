@@ -8,6 +8,9 @@ import java.security.*;
 import java.io.InputStream;
 import java.util.*;
 
+import java.util.HashMap; 
+import java.util.Map;
+
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
@@ -257,6 +260,9 @@ public class DFS
                                             // Initial time is zero to ensure it gets updated the first time its requested. 
     int items_per_page = 1000;
     int sleepTime = 500;
+
+    HashMap <String, CatalogPage> reverseIndex;
+
     
     //END DFS Variables
     
@@ -264,6 +270,8 @@ public class DFS
     {
         catalogItems = new ArrayList<CatalogItem>();
         local_metadata = new FilesJson();
+        reverseIndex = new HashMap<String, CatalogPage>(3000); 	//3k is the number of words in common use.
+        														// Oxford english dictionary contains 171k words in current use.
         
         this.port = port;
         long guid = md5("" + port);
@@ -434,18 +442,161 @@ public class DFS
     //TODO: Pre-process the music.json catalog and produce the sorted catalogs
     private void createSortedCatalogs(String fileName)
     {
+    	//Done in separate project
     }
 
     public void createIndex() throws Exception
     {
         System.out.println("createIndex()");
-        createIndex("album.json");
-        //createIndex("artist.json");
-        //createIndex("song.json");
+
+        //-----Outline-----
+
+        //1 Load Catalog
+
+        //2 For each song 
+        	//For each word in (song name, artist name and album name)
+	        	//if first 2 chars of word exists in Hash (Reverse Index)
+	        		//add song to CatalogPage
+	        	//else
+	        		//add first 2 chars word to Hash ()
+	        		//add song to CatalogPage
+
+
+        //-----Implementation-----
+
+        //1 Load Catalog
+        CatalogPage catalog = new CatalogPage();
+        catalog.loadCatalog("music.json"); //only use .loadCatalog on  "music.json".
+        int start = 0;
+        int end = catalog.size(); // ~10k
+
+        //DEBUG - Print Start and end Index
+        System.out.println("start: " + start);
+        System.out.println("end: " + end);
+
+        //2 For each song in catalog
+        //for(int i = 0 ; i < catalog.size(); i++ )//Full Version
+        for(int i = start ; i < end; i++ )//TEST LIMIT 100
+
+        {
+
+        	//Separate name into words
+        	String line = catalog.getItem(i).artist.name;
+        	//System.out.println("line: (" + line +")"); // DEBUG - Print Line
+        	line = line.toLowerCase();
+            String[] words = line.split("\\s+");
+
+
+
+
+
+            //Remove punctuation // Not Necesary for now
+            /**
+			for (int j = 0; j < words.length; j++) {
+			    // You may want to check for a non-word character before blindly
+			    // performing a replacement
+			    // It may also be necessary to adjust the character class
+			    words[i] = words[i].replaceAll("[^\\w]", "");
+			}
+			**/
+
+            //For each word
+			for (int k = 0; k < words.length; k++) {
+            	//System.out.println("\t"+ "word: (" + words[k] +")"); // DEBUG - Print each word
+
+        		//Get key
+        		String key = words[k];
+        		if(key.length()>2)
+        		{
+        			key = key.substring(0,2);//get first 2 characters only
+        		}
+
+	        	//if first 2 chars of word exists in Hash (Reverse Index)
+	        	if (reverseIndex.containsKey(key))  
+	        	{ 
+	        		//add song to CatalogPage
+	            	//System.out.println("\t" + "add song to CatalogPage"); // DEBUG
+
+	            	reverseIndex.get(key).addItem(catalog.getItem(i));			//Uses 2 chars as key
+	            	//reverseIndex.get(words[k]).addItem(catalog.getItem(i));	//Uses Full word as Key
+
+	        	}
+	        	else
+	        	{
+	        		//System.out.println("\t"+ "add word to Hash ("+ words[k] +")"); // DEBUG
+
+	        		//add song to new CatalogPage
+	        		CatalogPage capa = new CatalogPage();
+	        		capa.addItem(catalog.getItem(i));
+
+	        		//add first two chars of word to Hash ()
+	        		reverseIndex.put(key, capa);
+
+	        	}
+	        		
+	        }
+
+        }
+
+        System.out.println("Indexing Done.");
     }
 
+	//WIP
+    public void reverseIndexStats()
+    {
+    	System.out.println("\n");
+        System.out.println("reverseIndexStats()");
+        System.out.println("reverseIndex Size: " + reverseIndex.size());//Number of words in hash
+
+        //Average Variables
+ 		Double CMA = 0.0;	// Cummulative Moving Average
+ 		int count = 0;		// Used to calculate CMA
+
+ 		// Get all keys and the size 
+ 		ArrayList<String> words = new ArrayList<String>(); 
+        for (Map.Entry<String,CatalogPage> entry : reverseIndex.entrySet())
+        {  
+        	int size = entry.getValue().size();
+            //System.out.println("Key = " + entry.getKey() + ", Value.size() = " + entry.getValue().size());
+            words.add(entry.getKey() + " : " +size);
+
+            CMA = CMA + ((size - CMA)/(count+1));
+            count = count +1;
+        }
+
+        //Sort List
+        Collections.sort(words);
+		System.out.println("Sorted List:");
+        for(String s : words)
+        {
+            System.out.println(s);
+        }
+
+        //Print Average number of Items per key
+        System.out.println("\nCMA: " + CMA);
+    }
+
+	// Generic Method // Not used because I want to access .size() method on CatalogPage
+    public void printMap(Map mp) 
+    {
+	    Iterator it = mp.entrySet().iterator();
+	    while (it.hasNext()) {
+	        Map.Entry pair = (Map.Entry)it.next();
+	        System.out.println(pair.getKey() + " = " + pair.getValue());
+	        it.remove(); // avoids a ConcurrentModificationException
+	    }
+	}
+
+    public void saveReverseIndexToPeers()
+    {
+
+        //3 Split Reverse Index into pages and save each one to a peer.
+        //for each word in Hash
+    }
+
+
     //Assuming the given file is pre-sorted
-    public void createIndex(String fileName) throws Exception
+    public void create(String fileName) throws Exception
     {
         System.out.println("createIndex(" + fileName + ")");
 
@@ -459,6 +610,7 @@ public class DFS
         else
         {
             catalog.readJsonFile(fileName);  //use this if using a sorted catalog.
+            //Sorted Catalogs: album.json, artist.json, song.json
         }
 
 
@@ -540,142 +692,6 @@ public class DFS
     }
 
 
-
-	/**
-	 * create an empty file 
-	  *
-	 * @param filename Name of the file
-	 */
-    /**
-    public void create(String fileName) throws Exception
-    {
-
-    	//TODO:
-    	//Accept .mp3 files??
-
-        // DONE:
-        // Accept music.json
-        // Write Metadata
-        // Write Pages
-
-        //DEBUG
-        String TAG = "DFS.create";
-        System.out.println(TAG + "(" + fileName + ")");
-        
-
-
-        // LoadCatalog
-        loadCatalog(fileName);
-        System.out.println(TAG + ":catalogItems.size() = " + catalogItems.size()); //DEBUG 
-
-        // Variables
-        CatalogPage catalogpage = new CatalogPage(); // Data // CatalogPage is an ArrayList<CatalogItem>
-        FileJson file = new FileJson();      	// metadata
-        FilesJson metadata = new FilesJson();	// metadata
-        int page_size = 0;
-        Long file_size = (long) 0;
-
-
-        // Split file into n pages
-        // for each item in catalog save it to a "page"
-        for(int i = 0 ; i < catalogItems.size(); i++ )
-        {
-
-
-            // Page groups of size "items_per_page"
-            page_size =  page_size + 1;
-
-            //get item from catalog and add it to the page
-            catalogpage.addItem(catalogItems.get(i));
-            
-            //if page size reaches "items_per_page" save the page
-            if( (i+1)%this.items_per_page == 0)
-            {
-
-                // DEBUG
-                //System.out.println("i + 1 = " + (i+1) );
-                System.out.println("\tpage_size = " + page_size);
-
-                // Hash each page (name + time stamp) to get its GUID
-                Long timeStamp = System.currentTimeMillis();
-                Long guid = md5(fileName + timeStamp);
-                System.out.println("\tguid = "  + guid ); // DEBUG
-
-                // Update MetaData
-                file.addPage(guid, page_size, "?"); // metadata //? = unsorted
-
-                // Save page at its corresponding node
-                writePageData(catalogpage, guid);
-
-                //reset page
-                catalogpage = new CatalogPage();
-                page_size = 0; // metadata
-            }
-
-            //Save Last Page if its smaller than "items_per_page"
-            else if(i == catalogItems.size()-1 )
-            {
-                // DEBUG
-                System.out.println("\tLast Page: smaller than " + this.items_per_page); // DEBUG
-                System.out.println("\tpage_size = " + page_size); // DEBUG
-                //System.out.println("i + 1 = " + (i+1) ); // DEBUG
-
-                // Hash each page (name + time stamp) to get its GUID
-                Long timeStamp = System.currentTimeMillis();
-                Long guid = md5(fileName + timeStamp);
-                System.out.println("\tguid = "  + guid ); // DEBUG
-
-                //Update MetaData
-                file.addPage(guid, page_size, "?"); // metadata
-
-                // Save page at its corresponding node
-                writePageData(catalogpage, guid);
-
-                //reset page
-                catalogpage = new CatalogPage();
-                page_size = 0;
-            }
-        }
-
-        // Save metadata.json to Chord
-        file.setName(fileName);
-        file.setSize(file_size);
-        metadata.addFile(file);
-        writeMetaData(metadata);
-    }
-    **/
-
-    /**
-    public void loadCatalog(String fileName)
-    {
-
-        //DEBUG
-        String TAG = "loadCatalog";
-        System.out.println(TAG + "(" + fileName + ")" );
-
-        //String full_path = "./assets/music.json"
-
-        // Try to open the file for reading
-        try {
-            
-            //JSON
-            JsonReader jsonReader = new JsonReader(new FileReader(fileName));
-            
-            //GSON
-            Gson gson = new Gson();
-
-            jsonReader.beginArray();
-
-            while (jsonReader.hasNext()) {
-                CatalogItem item = gson.fromJson(jsonReader, CatalogItem.class);
-                catalogItems.add(item);
-            }
-            jsonReader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    **/
     
 	/**
 	 * delete file 

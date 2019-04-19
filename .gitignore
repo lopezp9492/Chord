@@ -24,6 +24,7 @@ $RECYCLE.BIN/
 *.DS_Store
 *.class
 images/**
+old_code/**
 old_commands/**
 old_RemoteInputFileStream/**
 **/repository/**

@@ -47,14 +47,15 @@ public class DFSCommand
             //pedro
             if (result[0].equals("create"))
             {
-                //dfs.create("music.json");
-                //initialized = true;
+                dfs.create("music.json");
             }
 
             //
             if (result[0].equals("ci"))//createIndex
             {
                 dfs.createIndex();
+                dfs.reverseIndexStats();
+                //dfs.saveReverseIndexToPeers();
             }
 
             if (result[0].equals("list"))
