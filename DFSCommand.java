@@ -55,7 +55,7 @@ public class DFSCommand
             {
                 dfs.createIndex();
                 dfs.reverseIndexStats();
-                //dfs.saveReverseIndexToPeers();
+                dfs.saveReverseIndexToPeers();
             }
 
             if (result[0].equals("list"))
@@ -141,15 +141,15 @@ public class DFSCommand
             }
             if(result[0].equals("search"))
             {
-                String filter = "happy";
-                int count = 20;
+                String filter = "happy"; //default filter
+                int count = 20;// default count
 
-                //If filter specified update filter
+                //If filter is specified update the filter
                 if(result.length > 1)
                 {
                     filter = result[1];
                 } 
-                //If count specified update count
+                //If count is specified update count
                 if(result.length > 2)
                 {
                     count = Integer.parseInt(result[2]);
@@ -159,8 +159,7 @@ public class DFSCommand
                 System.out.println("count: " + count);
 
                 Long startTime = System.currentTimeMillis();
-                //JsonObject jo = dfs.search(filter, count);
-                JsonObject jo = dfs.indexSearch(filter, count);
+                JsonObject jo = dfs.search(filter, count);
 
                 Long endTime = System.currentTimeMillis();
                 Long runTime = endTime-startTime;
@@ -174,7 +173,47 @@ public class DFSCommand
                 System.out.println("runTime: "+ runTime);
 
             }
+            if(result[0].equals("is"))
+            {
+                String filter = "happy";    //default filter
+                int count = 20;             // default count
 
+                //If filter is specified update the filter
+                if(result.length > 1)
+                {
+                    filter = result[1];
+                } 
+                //If count is specified update count
+                if(result.length > 2)
+                {
+                    count = Integer.parseInt(result[2]);
+                } 
+                System.out.println("Searching...");
+                System.out.println("filter: " + filter);
+                System.out.println("count: " + count);
+
+                //Start Timer
+                Long startTime = System.currentTimeMillis();
+
+                JsonObject jo = dfs.indexSearch(filter, count);
+
+                //End Timer
+                Long endTime = System.currentTimeMillis();
+                Long runTime = endTime-startTime;
+
+
+                Gson gson = new Gson();
+                String jsonString = gson.toJson(jo);
+                System.out.println(jsonString);
+
+                System.out.println("search complete.");
+                System.out.println("runTime: "+ runTime + " miliseconds");
+
+            }
+            if(result[0].equals("g"))
+            {
+                dfs.generateKeyGuid("moon");
+            }
             if(result[0].equals("quit"))
             {
                 System.out.println("stoping...");
