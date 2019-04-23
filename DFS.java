@@ -262,6 +262,7 @@ public class DFS
     int sleepTime = 500;
 
     HashMap <String, CatalogPage> reverseIndex;
+    ArrayList<String> sortedKeys;
 
     
     //END DFS Variables
@@ -272,6 +273,7 @@ public class DFS
         local_metadata = new FilesJson();
         reverseIndex = new HashMap<String, CatalogPage>(3000); 	//3k is the number of words in common use.
         														// Oxford english dictionary contains 171k words in current use.
+        sortedKeys = new ArrayList<String>();
         
         this.port = port;
         long guid = md5("" + port);
@@ -285,7 +287,35 @@ public class DFS
         });
         
     }
-    
+
+    //WIP
+
+    //Maps the file to a treemap
+    public void map(String fileName)
+    {
+    	//fileName = music.json
+
+    	//1 Get music.json metadata
+
+    	//2 for each page in file "music.json"
+
+    		//get page guid
+
+    		//locate peer 
+
+    		//peer.map(guid)
+    }    
+
+	//tell every peer to emit their tree
+    public void reduce(Long guid)
+    {
+    	//tell successor to emit their tree
+
+    	//1 locate successor
+
+    	//peer.emit()
+
+    }
   
 	/**
 	 * Join the chord
@@ -521,9 +551,11 @@ public class DFS
 	            	//reverseIndex.get(words[k]).addItem(catalog.getItem(i));	//Uses Full word as Key
 
 	        	}
-	        	else
+	        	else // this is a new key, add it to the HashMap
 	        	{
 	        		//System.out.println("\t"+ "add word to Hash ("+ words[k] +")"); // DEBUG
+	        		sortedKeys.add(key);//used later when saving the files to the peers.
+
 
 	        		//add song to new CatalogPage
 	        		CatalogPage capa = new CatalogPage();
@@ -541,7 +573,6 @@ public class DFS
         System.out.println("Indexing Done.");
     }
 
-	//WIP
     public void reverseIndexStats()
     {
     	System.out.println("\n");
@@ -574,6 +605,8 @@ public class DFS
 
         //Print Average number of Items per key
         System.out.println("\nCMA: " + CMA);
+        System.out.println("\nwords.size(): " + words.size());
+
     }
 
 	// Generic Method // Not used because I want to access .size() method on CatalogPage
@@ -587,11 +620,42 @@ public class DFS
 	    }
 	}
 
+    //WIP 
     public void saveReverseIndexToPeers()
     {
+		System.out.println("saveReverseIndexToPeers()"); // DEBUG
 
-        //3 Split Reverse Index into pages and save each one to a peer.
-        //for each word in Hash
+    	Collections.sort(sortedKeys);
+        System.out.println("\nsortedKeys.size(): " + sortedKeys.size());
+
+
+    	//-----Outline
+    	//for each key in HashMap
+    		//save it to a peer
+
+    	//-----Implementation
+    	//for each key in HashMap, get its value and save it to a peer
+    	for(String k : sortedKeys)
+    	{
+    		System.out.println("key: " + k);//DEBUG
+
+
+    		//generate guid
+            //Long timeStamp = System.currentTimeMillis();
+            Long guid = md5( k + "reverseIndex" + k ); // + timeStamp);
+            System.out.println("\tguid = "  + guid ); // DEBUG
+
+    		//save the page to a peer
+    		try
+    		{
+	    		writePageData(reverseIndex.get(k), guid);
+    		}
+    		catch(Exception e)
+    		{
+    			System.out.println("Error while saving reverseIndex key: " + k); // DEBUG
+    		}
+    	}
+		System.out.println("save done."); // DEBUG
     }
 
 
@@ -790,12 +854,88 @@ public class DFS
 		return peer.get(guid);
     }
 
-    //TODO
-    public JsonObject indexSearch(String filter, int count)
+    //TODO timing
+    public JsonObject indexSearch(String filter, int count) throws Exception
     {
-            JsonObject response = new JsonObject();
 
-            return response;
+    	String TAG = "indexSearch";
+		System.out.println(TAG + "(" + filter+ ", " + count + ")" ); // DEBUG
+
+
+    	//return variable
+		JsonArray ret = new JsonArray();
+
+        //get key out of filter // assuming one word for now // for multiple word filter: split filter then do multiple searches
+        String key = filter.substring(0,2);//get first 2 characters only
+
+        //re-generate guid from key
+        Long guid = md5(key + "reverseIndex" + key );
+        ChordMessageInterface peer = chord.locateSuccessor(guid); 
+
+    	CatalogPage catalogPage = new CatalogPage();
+        try{
+            //Remote Input File Stream
+            RemoteInputFileStream dataraw = peer.get(guid);//index = page number
+
+            System.out.println("\t"+ TAG+":connecting."); // DEBUG
+            dataraw.connect();// new RFIS
+
+            //Scanner
+            System.out.println("\t" + TAG+":scanning."); // DEBUG
+            Scanner scan = new Scanner(dataraw);
+            scan.useDelimiter("\\A");
+            String data = scan.next();
+            //System.out.println(data); // DEBUG
+
+            //Convert from json to ArrayList
+            System.out.println("\t" + TAG + ":converting json to CatalogPage.");//DEBUG
+            Gson gson = new Gson();
+            catalogPage = gson.fromJson(data, CatalogPage.class);
+
+            //System.out.println("\t" + TAG + ":Read Complete.");
+            //System.out.println("\t page.size(): " + page.size());
+            //return page;
+        }catch(Exception e)
+        {
+            System.out.println(":error in indexSearch: ");
+        }
+
+
+		//search each item in the catalogPage
+		System.out.println(TAG + ": searching page..." ); // DEBUG
+    	int songs_found = 0; // Count number of songs found
+		for(int j = 0 ; j < catalogPage.size(); j++)
+		{
+			//if item passes filter
+			//if(ci.passesFilter(filter))
+            if(catalogPage.getItem(j).passesFilter(filter))
+			{
+				//add to response
+				//ret.add(ci.getJson());
+                ret.add(catalogPage.getItem(j).getJson());
+
+				songs_found = songs_found+1;
+                //System.out.println("\t\tsearch page: " + index); // DEBUG
+                System.out.println("\t\tfound so far: " + songs_found); // DEBUG
+
+				if(songs_found >= count)
+				{        
+                    //DEBUG
+					System.out.println("max matches found.");
+					System.out.println("\tmatches found: " + songs_found);
+					JsonObject response = new JsonObject();
+					response.add("ret", ret);
+					return response;
+				}
+			}
+
+		}
+		
+		//return json array;
+		System.out.println("\tmatches found: " + songs_found);
+		JsonObject response = new JsonObject();
+		response.add("ret", ret);
+        return response;
 
     }
 
@@ -1032,5 +1172,16 @@ public class DFS
     	//save data to peer
     	peer.put(guid, data); // send page
 
+    }
+
+    public void generateKeyGuid(String word)
+    {
+        System.out.println("word: "+ word); // DEBUG
+
+    	String key = word.substring(0,2);
+        System.out.println("key: "+ key); // DEBUG
+
+        Long guid = md5 (key + "reverseIndex" + key);
+        System.out.println("guid: "+ guid); // DEBUG
     }
 }
