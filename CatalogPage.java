@@ -18,13 +18,15 @@ enum Order
 public class CatalogPage
 {
      List<CatalogItem> items;
-     Order order;
+     Order order;               //used when printing
+     String key;                //used when "emiting"
      
      
      public CatalogPage() 
      {
          items = new ArrayList<CatalogItem>();
          order = Order.UNSORTED;
+         key = "??";
      }
 
     // getters-----------------------------
@@ -36,6 +38,11 @@ public class CatalogPage
      public int size()
      {
         return items.size();
+     }
+
+     public String getKey()
+     {
+        return key;
      }
 
      //returns the first letter of the first item
@@ -91,6 +98,11 @@ public class CatalogPage
      public void clear()
      {
          items.clear();
+     }
+
+     public void setKey(String key)
+     {
+        this.key = key;
      }
      
      // Sorting Functions----------------------------------------
