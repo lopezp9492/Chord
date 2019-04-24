@@ -141,8 +141,8 @@ public class DFSCommand
             }
             if(result[0].equals("search"))
             {
-                String filter = "happy"; //default filter
-                int count = 20;// default count
+                String filter = "happy";    // default filter
+                int count = 20;             // default count
 
                 //If filter is specified update the filter
                 if(result.length > 1)
@@ -173,9 +173,9 @@ public class DFSCommand
                 System.out.println("runTime: "+ runTime);
 
             }
-            if(result[0].equals("is"))
+            if(result[0].equals("is"))// is = Index Searchhk
             {
-                String filter = "happy";    //default filter
+                String filter = "happy";    // default filter
                 int count = 20;             // default count
 
                 //If filter is specified update the filter
@@ -210,7 +210,7 @@ public class DFSCommand
                 System.out.println("runTime: "+ runTime + " miliseconds");
 
             }
-            if(result[0].equals("g"))
+            if(result[0].equals("g"))// This command is for testing only
             {
                 dfs.generateKeyGuid("moon");
             }
