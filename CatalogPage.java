@@ -268,7 +268,7 @@ public class CatalogPage
                 System.out.println("Album: " + items.get(i).release.name);
                 break;
             case bySong:
-                System.out.println("Tittle: " + items.get(i).song.title);
+                System.out.println("Title: " + items.get(i).song.title);
                 break;
             default:
                 System.out.println("Unsorted: " + items.get(i).artist.name);

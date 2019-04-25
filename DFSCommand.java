@@ -243,6 +243,7 @@ public class DFSCommand
         System.out.println("\tappend (not implemented)");
 
         System.out.println("\tsearch (filter, count)(\"name or artist or album\" , count)");
+        System.out.println("\tis     (Index Search)");
 
         System.out.println("\t");
         System.out.println("\tquit (freezes?)");

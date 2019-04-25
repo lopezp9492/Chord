@@ -498,7 +498,7 @@ public class DFS
         CatalogPage catalog = new CatalogPage();
         catalog.loadCatalog("music.json"); //only use .loadCatalog on  "music.json".
         int start = 0;
-        int end = catalog.size(); // ~10k
+        int end = catalog.size(); // size = 10k
 
         //DEBUG - Print Start and end Index
         System.out.println("start: " + start);
@@ -510,17 +510,20 @@ public class DFS
 
         {
 
-        	//Separate name into words
+        	//Get all words in artist, album and song title
         	String line = catalog.getItem(i).artist.name;
+        	line = line + " " + catalog.getItem(i).release.name; // album
+        	line = line + " " + catalog.getItem(i).song.title;
+
         	//System.out.println("line: (" + line +")"); // DEBUG - Print Line
         	line = line.toLowerCase();
+
+        	//Separate line into words
             String[] words = line.split("\\s+");
 
 
-
-
-
-            //Remove punctuation // Not Necesary for now
+            //TODO
+            //Remove punctuation // Remove Special Symbols
             /**
 			for (int j = 0; j < words.length; j++) {
 			    // You may want to check for a non-word character before blindly
