@@ -8,6 +8,7 @@ import java.security.*;
 import java.io.InputStream;
 import java.util.*;
 
+import java.util.TreeMap;
 import java.util.HashMap; 
 import java.util.Map;
 
@@ -261,8 +262,9 @@ public class DFS
     int items_per_page = 1000;
     int sleepTime = 500;
 
-    HashMap <String, CatalogPage> reverseIndex;
-    ArrayList<String> sortedKeys;
+    TreeMap <String, CatalogPage> reverseIndex;
+    //HashMap <String, CatalogPage> reverseIndex;
+    //ArrayList<String> sortedKeys;
 
     
     //END DFS Variables
@@ -271,7 +273,9 @@ public class DFS
     {
         catalogItems = new ArrayList<CatalogItem>();
         local_metadata = new FilesJson();
-        reverseIndex = new HashMap<String, CatalogPage>(3000); 	//3k is the number of words in common use.
+        reverseIndex = new TreeMap<String, CatalogPage>(3000);  //3k is the number of words in common use.
+
+        //reverseIndex = new HashMap<String, CatalogPage>(3000); 	//3k is the number of words in common use.
         														// Oxford english dictionary contains 171k words in current use.
         sortedKeys = new ArrayList<String>();
         
