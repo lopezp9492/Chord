@@ -644,7 +644,6 @@ public class DFS
 	    }
 	}
 
-    //WIP 
     public void saveReverseIndexToPeers()
     {
 		System.out.println("saveReverseIndexToPeers()"); // DEBUG
@@ -988,7 +987,7 @@ public class DFS
 
 	    	// Find music.json in metadata
 	    	System.out.println(TAG + ": Find music.json in metadata"); // DEBUG
-    		FileJson file = files.getFile(0);
+    		FileJson file = files.getFile(0);//I know this is not good, I'm assuming that only music.json exists in files.
     		System.out.println(TAG + ": file.getNumberOfPages(): "  + file.getNumberOfPages() ); // DEBUG
 
 
@@ -1217,6 +1216,7 @@ public class DFS
     //All unsorted pages have been saved to the peers in the chord.
     public void runMapReduce()
     {
+        String TAG = "runMapReduce()";
         //-----Outline-----
         //read music.json metadata
         //for each page in music.json
@@ -1231,5 +1231,47 @@ public class DFS
         //wait until all keys are stored at their proper peer.
 
         //Bulk // (Save all nodes in TreeMap as their own file). 
+
+        //-----Implementation-----
+        //read music.json metadata
+        FileJson file = new FileJson();
+        try
+        {
+
+        
+        FilesJson files = readMetaData();
+
+        // Find music.json in metadata
+        System.out.println(TAG + ": Find music.json in metadata"); // DEBUG
+        file = files.getFile(0);//I know this is not good, I'm assuming that only music.json exists in files.
+        System.out.println(TAG + ": file.getNumberOfPages(): "  + file.getNumberOfPages() ); // DEBUG
+
+        }
+        catch(Exception e)
+        {
+            System.out.println(TAG + ": error reading metadata");
+        }
+
+        // Count number of songs
+        int songs_found = 0;
+
+        //for each page in music.json
+            //get guid
+            //locateSuccessor(page.guid)
+            //map(guid)
+        System.out.println(TAG + ": mapping pages..."); // DEBUG
+        for(int index = 0 ; index < file.getNumberOfPages(); index++)
+        {
+            //get guid
+            Long guid = file.getPage(index).getGUID();
+            // locate successor
+            ChordMessageInterface peer = this.locateSuccessor(guid);
+            //map(guid) 
+            peer.map(guid);
+        }
+
+        //wait until all pages are mapped
+
+            //??WIP?? 
     }
 }
