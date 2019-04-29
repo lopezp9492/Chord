@@ -178,6 +178,8 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
         //else skip to next node
 
       //-----Implementation-----
+      Gson gson = new Gson();
+
       //for each node in TreeMap
       for(Map.Entry<String,CatalogPage> entry : tm.entrySet()) 
       {
@@ -203,14 +205,14 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
             //TODO: Test Compilation
 
             //send using RemoteInputFileStream
-            //RemoteInputFileStream file = new RemoteInputFileStream(entry.getValue());//WIP TODO: CONVERT emtry.getValue to String
-            //peer.store(file);
+            RemoteInputFileStream file = new RemoteInputFileStream(gson.toJson( entry.getValue() ) ); //WIP TODO: CONVERT emtry.getValue to String
+            peer.store(file);
           }
         
         }
         catch(Exception e)
         {
-
+            System.out.println("something bad happened in sendAll() function");
         }
       
       }//END for each node in TreeMap
