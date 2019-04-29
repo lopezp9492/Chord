@@ -210,10 +210,18 @@ public class DFSCommand
                 System.out.println("runTime: "+ runTime + " miliseconds");
 
             }
+            
             if(result[0].equals("g"))// This command is for testing only
             {
                 dfs.generateKeyGuid("moon");
             }
+
+
+            if(result[0].equals("chord"))// This command is for testing only
+            {
+                dfs.determineChordSize();
+            }
+
             if(result[0].equals("quit"))
             {
                 System.out.println("stoping...");
