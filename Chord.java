@@ -154,11 +154,50 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
       }
 
       System.out.println("Indexing Done.");
-      //for each word in the "title", "album", "artist"
 
-        //store catalog item in tree
+      // At this point the local file has been indexed
+      // and stored in the TreeMap.
 
+      // This process will be repeated for each page file in this peer.
+      // Once all local page files have been processed...
 
+      //Send() the the nodes to the correct peer 
+
+    }
+
+    //Send all TreeMap nodes that dont belong in this peer.
+    public void sendAll()
+    {
+
+      //-----OutLine-----
+      //for each node in TreeMap
+        //determine guid
+        //if successor is not this peer
+          //send to proper peer
+        //else skip to next node
+
+      //-----Implementation-----
+      //for each node in TreeMap
+        //determine guid
+        //if successor is not this peer
+          //send to proper peer
+        //else skip to next node
+    }
+
+    //Send an item  "key, <s1, s2, s3...> " aka CatalogPage
+    public void send()
+    {
+
+    }
+
+    //place received file into TreeMap
+      //if tree map already contains the key then combine received page with current page
+      //else just store the new page
+    public void store()
+    {
+      //place received file into TreeMap
+        //if tree map already contains the key then combine received page with current page
+        //else just store the new page
     }
 
     public void emit()
@@ -173,7 +212,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     public void bulk()
     {
       //for each CatalogPage in TreeMap
-      
+
         //generate guid
 
         //save to file
