@@ -13,6 +13,13 @@ import java.net.*;
 import java.util.*;
 import java.io.*;
 
+import com.google.gson.Gson;
+import java.security.*;
+import java.math.BigInteger;
+
+
+
+
 /**
  * Chord extends from UnicastRemoteObject to support RMI.
  * It implements the ChordMessageInterface
@@ -52,7 +59,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     TreeMap <String, CatalogPage> tm;
 
     //-----MY METHODS------
-    public void map(long guid)
+    public void map(long guid) throws RemoteException
     {
 
       //---Outline---
@@ -72,7 +79,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
       RemoteInputFileStream rawdata = null;
       CatalogPage catalogPage = new CatalogPage();
       try {
-          rawdata = new RemoteInputFileStream(prefix + guidObject);
+          rawdata = new RemoteInputFileStream(prefix + guid);
           rawdata.connect();
           Scanner scan = new Scanner(rawdata);
           scan.useDelimiter("\\A");
@@ -92,9 +99,9 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
       {
 
         //Get all words in artist, album and song title
-        String line = catalog.getItem(i).artist.name;
-        line = line + " " + catalog.getItem(i).release.name; // album
-        line = line + " " + catalog.getItem(i).song.title;
+        String line = catalogPage.getItem(i).artist.name;
+        line = line + " " + catalogPage.getItem(i).release.name; // album
+        line = line + " " + catalogPage.getItem(i).song.title;
 
         //System.out.println("line: (" + line +")"); // DEBUG - Print Line
         line = line.toLowerCase();
@@ -126,28 +133,21 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
           }
 
           //if first 2 chars of word exists in Hash (Reverse Index)
-          if (reverseIndex.containsKey(key))  
+          if (tm.containsKey(key))  
           { 
             //add song to CatalogPage
               //System.out.println("\t" + "add song to CatalogPage"); // DEBUG
 
-              reverseIndex.get(key).addItem(catalog.getItem(i));      //Uses 2 chars as key
-              //reverseIndex.get(words[k]).addItem(catalog.getItem(i)); //Uses Full word as Key
-
+              tm.get(key).addItem(catalogPage.getItem(i));      //Uses 2 chars as key
           }
           else // this is a new key, add it to the HashMap
           {
-            //System.out.println("\t"+ "add word to Hash ("+ words[k] +")"); // DEBUG
-            sortedKeys.add(key);//used later when saving the files to the peers.
-
-
             //add song to new CatalogPage
             CatalogPage capa = new CatalogPage();
-            capa.addItem(catalog.getItem(i));
+            capa.addItem(catalogPage.getItem(i));
 
             //add first two chars of word to Hash ()
-            reverseIndex.put(key, capa);
-
+            tm.put(key, capa);
           }
             
         }
@@ -177,32 +177,45 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
           //send to proper peer
         //else skip to next node
 
-      //-----Implementation----- WIP
+      //-----Implementation-----
       //for each node in TreeMap
       for(Map.Entry<String,CatalogPage> entry : tm.entrySet()) 
       {
         //determine guid
         String k = entry.getKey();
         Long guid = md5( k + "reverseIndex" + k );
-        ChordMessageInterface peer = chord.locateSuccessor(guid); // locate successor
 
-        //compare guids (compare long values)
-        int result = Long.compare(peer.getId(), this.guid);
-
-        //if successor is this peer
-        if(result == 0)
+        try
         {
-          //skip to next node
+          ChordMessageInterface peer = this.locateSuccessor(guid); // locate successor
+
+          //compare guids (compare long values)
+          int result = Long.compare(peer.getId(), this.guid);
+
+          //if successor is this peer
+          if(result == 0)
+          {
+            //skip to next node
+          }
+          else //send to proper peer
+          {
+            //save to temporary file?
+            //TODO: Test Compilation
+
+            //send using RemoteInputFileStream
+            //RemoteInputFileStream file = new RemoteInputFileStream(entry.getValue());//WIP TODO: CONVERT emtry.getValue to String
+            //peer.store(file);
+          }
+        
         }
-        else
+        catch(Exception e)
         {
-          //send to proper peer
+
         }
+      
+      }//END for each node in TreeMap
 
-      }
-
-
-    }
+    }//END sendAll()
 
     //Send an item  "key, <s1, s2, s3...> " aka CatalogPage
     public void send()
@@ -213,7 +226,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     //place received file into TreeMap
       //if tree map already contains the key then combine received page with current page
       //else just store the new page
-    public void store(long guid, RemoteInputFileStream rawdata) throws RemoteException
+    public void store(RemoteInputFileStream rawdata) throws RemoteException
     {
       //-----OutLine-----
       //receive data
@@ -231,14 +244,14 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
         String data = scan.next();
         Gson gson = new Gson();
         catalogPage = gson.fromJson(data, CatalogPage.class);
-      } catch (IOException e)
+      } catch (Exception e)
       {
           throw(new RemoteException(":error in store(): \\_(^_^)_/"));
       }
       //place received file into TreeMap
 
       //if tree map already contains the key 
-      if(tm.containsKey(catalogPage.getKey))
+      if(tm.containsKey(catalogPage.getKey()))
       {
         //then combine received page with current page
         for(int i = 0; i < catalogPage.size(); i ++)
@@ -249,7 +262,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
       else
       {
         //else just store the new page
-        tm.put(catalogPage.getKey, catalogPage);
+        tm.put(catalogPage.getKey(), catalogPage);
       }
     }
 
@@ -852,5 +865,26 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
         catch(RemoteException e){
 	       System.out.println("Cannot retrive id of successor or predecessor");
         }
+    }
+
+
+    //TODO: MOVE THIS DEFINITION AND THE ONE IN FDS CLASS TO A SEPARATE PACKAGE
+    //HASH FUNCTION
+    private long md5(String objectName)
+    {
+        try
+        {
+            MessageDigest m = MessageDigest.getInstance("MD5");
+            m.reset();
+            m.update(objectName.getBytes());
+            BigInteger bigInt = new BigInteger(1,m.digest());
+            return Math.abs(bigInt.longValue());
+        }
+        catch(NoSuchAlgorithmException e)
+        {
+                e.printStackTrace();
+                
+        }
+        return 0;
     }
 }
