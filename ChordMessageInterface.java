@@ -26,4 +26,6 @@ public interface ChordMessageInterface extends Remote
     public void addKeyValue(long key, int value)throws RemoteException;
     public void emit(long key, int value, String file)throws RemoteException; // Sends
     public void bulk(int page)throws RemoteException;
+
+    public void store(RemoteInputFileStream rifs)throws RemoteException;
 }
