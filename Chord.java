@@ -69,7 +69,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
 
         //for each word in the "title", "album", "artist"
 
-          //store catalog item in  
+          //store catalog item in TreeMap 
 
 
       //---Implementation---
