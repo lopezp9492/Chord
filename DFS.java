@@ -405,7 +405,7 @@ public class DFS
             String strMetaData = scan.next();
 
             //System.out.println(strMetaData); // DEBUG
-            filesJson= gson.fromJson(strMetaData, FilesJson.class);
+            filesJson = gson.fromJson(strMetaData, FilesJson.class);
         } catch (NoSuchElementException ex)
         {
             filesJson = new FilesJson();
@@ -527,8 +527,7 @@ public class DFS
         System.out.println("end: " + end);
 
         //2 For each song in catalog
-        //for(int i = 0 ; i < catalog.size(); i++ )//Full Version
-        for(int i = start ; i < end; i++ )//TEST LIMIT 100
+        for(int i = start ; i < end; i++ )
 
         {
 
@@ -1212,5 +1211,25 @@ public class DFS
 
         Long guid = md5 (key + "reverseIndex" + key);
         System.out.println("guid: "+ guid); // DEBUG
+    }
+
+    //Precondition: create(music.json) was called before.
+    //All unsorted pages have been saved to the peers in the chord.
+    public void runMapReduce()
+    {
+        //-----Outline-----
+        //read music.json metadata
+        //for each page in music.json
+            //peer = locateSuccessor(page.guid)
+            //peer.map(guid)
+
+        //wait until all pages are mapped
+
+        //for each key in TreeMap at every peer
+            //send entry set to proper peer. //sendAll() and store() 
+
+        //wait until all keys are stored at their proper peer.
+
+        //Bulk // (Save all nodes in TreeMap as their own file. 
     }
 }
