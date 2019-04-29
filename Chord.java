@@ -43,6 +43,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
 
     // path prefix
     String prefix;
+    String mapPrefix;
 
     // chord size
     int chordSize;
@@ -176,12 +177,31 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
           //send to proper peer
         //else skip to next node
 
-      //-----Implementation-----
+      //-----Implementation----- WIP
       //for each node in TreeMap
+      for(Map.Entry<String,CatalogPage> entry : tm.entrySet()) 
+      {
         //determine guid
-        //if successor is not this peer
+        String k = entry.getKey();
+        Long guid = md5( k + "reverseIndex" + k );
+        ChordMessageInterface peer = chord.locateSuccessor(guid); // locate successor
+
+        //compare guids (compare long values)
+        int result = Long.compare(peer.getId(), this.guid);
+
+        //if successor is this peer
+        if(result == 0)
+        {
+          //skip to next node
+        }
+        else
+        {
           //send to proper peer
-        //else skip to next node
+        }
+
+      }
+
+
     }
 
     //Send an item  "key, <s1, s2, s3...> " aka CatalogPage
@@ -193,17 +213,44 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     //place received file into TreeMap
       //if tree map already contains the key then combine received page with current page
       //else just store the new page
-    public void store()
+    public void store(long guid, RemoteInputFileStream rawdata) throws RemoteException
     {
       //-----OutLine-----
+      //receive data
       //place received file into TreeMap
         //if tree map already contains the key then combine received page with current page
         //else just store the new page
 
-    //-----Implementation-----
+      //-----Implementation-----
+      //receive data
+      CatalogPage catalogPage = new CatalogPage();
+      try {
+        rawdata.connect();
+        Scanner scan = new Scanner(rawdata);
+        scan.useDelimiter("\\A");
+        String data = scan.next();
+        Gson gson = new Gson();
+        catalogPage = gson.fromJson(data, CatalogPage.class);
+      } catch (IOException e)
+      {
+          throw(new RemoteException(":error in store(): \\_(^_^)_/"));
+      }
       //place received file into TreeMap
-        //if tree map already contains the key then combine received page with current page
+
+      //if tree map already contains the key 
+      if(tm.containsKey(catalogPage.getKey))
+      {
+        //then combine received page with current page
+        for(int i = 0; i < catalogPage.size(); i ++)
+        {
+          tm.get(catalogPage.getKey()).addItem(catalogPage.getItem(i) );
+        }
+      }
+      else
+      {
         //else just store the new page
+        tm.put(catalogPage.getKey, catalogPage);
+      }
     }
 
     public void emit()
@@ -310,6 +357,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
         int j;
         // Initialize the variables
         prefix = "./" + guid + "/repository/";
+        mapPrefix = prefix + "/map/";
 	    finger = new ChordMessageInterface[M];
         for (j=0;j<M; j++){
 	       finger[j] = null;
