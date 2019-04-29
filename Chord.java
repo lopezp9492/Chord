@@ -60,10 +60,12 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     HashMap <Strin, Integer> pagesToProcess;  // <NameOfFile, pageCount> 
 
     //-----MY METHODS------
-    public void map(long guid) throws RemoteException
+    public void map(String fileName, long guid) throws RemoteException
     {
 
       //---Outline---
+      //update pagesToProcess
+
       //load CatalogPage
 
       //for each catalog item in the page
@@ -75,8 +77,18 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
 
       //---Implementation---
 
-      //load CatalogPage
+      // update pagesToProcess
+      if(pagesToProcess.containsKey(fileName))
+      {
+        int count = pagesToProcess.get(fileName);
+        pagesToProcess.put(fileName, count+1);
+      }
+      else
+      {
+        pagesToProcess.put(fileName, 1);
+      }
 
+      // load CatalogPage
       RemoteInputFileStream rawdata = null;
       CatalogPage catalogPage = new CatalogPage();
       try {
@@ -889,5 +901,10 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
                 
         }
         return 0;
+    }
+
+    public int getPagesToProcessCount(String fileName)
+    {
+      return pagesToProcess.get(fileName);
     }
 }
