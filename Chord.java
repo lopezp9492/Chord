@@ -44,12 +44,17 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     // path prefix
     String prefix;
 
+    // chord size
+    int chordSize;
+
     //Extra Variables
     TreeMap <String, CatalogPage> tm;
 
     //-----MY METHODS------
-    public void map(Long guid)
+    public void map(long guid)
     {
+      //load CatalogPage
+
       //for each catalog item in the page
 
         //for each word in the "title", "album", "artist"
@@ -59,18 +64,45 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
 
     public void emit()
     {
-        //for each key in the TreeMap emit "IndexItem"/"CatalogPage"
+        //for each key in the TreeMap emit "CatalogPage"
 
           //locate peer 
 
           //peer.store(CatalogPage)
     } 
 
+    public int getChordSize()
+    {
+      return this.chordSize;
+    }
+
     //-----END MY METHODS-----
 
     //-----NEW METHODS-----
     public void onChordSize(long source, int n) throws RemoteException
     {
+
+      //System.out.println("source id: " + source);
+      //System.out.println("this   id: " + this.guid);
+
+      if(n==0)
+      {
+        successor.onChordSize(source, ++n);
+      }
+      else
+      {
+        int result = Long.compare(source, this.guid);
+
+        if(result == 0)// if result == 0 they are equal
+        {
+          chordSize = n;
+        }
+        else
+        {
+          successor.onChordSize(source, ++n);
+        }
+      }
+
 
     }
     public void onPageCompleted(String file) throws RemoteException
@@ -118,7 +150,10 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
  */
     public Chord(int port, long guid) throws RemoteException {
 
+      chordSize = 1;
       tm = new TreeMap<String, CatalogPage>();
+
+
         int j;
         // Initialize the variables
         prefix = "./" + guid + "/repository/";
