@@ -53,6 +53,8 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     //-----MY METHODS------
     public void map(long guid)
     {
+
+      //---Outline---
       //load CatalogPage
 
       //for each catalog item in the page
@@ -60,6 +62,103 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
         //for each word in the "title", "album", "artist"
 
           //store catalog item in  
+
+
+      //---Implementation---
+
+      //load CatalogPage
+
+      RemoteInputFileStream rawdata = null;
+      CatalogPage catalogPage = new CatalogPage();
+      try {
+          rawdata = new RemoteInputFileStream(prefix + guidObject);
+          rawdata.connect();
+          Scanner scan = new Scanner(rawdata);
+          scan.useDelimiter("\\A");
+          String data = scan.next();
+          Gson gson = new Gson();
+          catalogPage = gson.fromJson(data, CatalogPage.class);
+
+
+      } catch (IOException e)
+      {
+          throw(new RemoteException("File does not exists"));
+      }
+
+
+      //for each catalog item in the page
+      for(int i = 0 ; i < catalogPage.size(); i++ )
+      {
+
+        //Get all words in artist, album and song title
+        String line = catalog.getItem(i).artist.name;
+        line = line + " " + catalog.getItem(i).release.name; // album
+        line = line + " " + catalog.getItem(i).song.title;
+
+        //System.out.println("line: (" + line +")"); // DEBUG - Print Line
+        line = line.toLowerCase();
+
+        //Separate line into words
+        String[] words = line.split("\\s+");
+
+
+        //TODO
+        //Remove punctuation // Remove Special Symbols
+        /**
+        for (int j = 0; j < words.length; j++) {
+          // You may want to check for a non-word character before blindly
+          // performing a replacement
+          // It may also be necessary to adjust the character class
+          words[i] = words[i].replaceAll("[^\\w]", "");
+        }
+        **/
+
+        //For each word
+        for (int k = 0; k < words.length; k++) {
+          //System.out.println("\t"+ "word: (" + words[k] +")"); // DEBUG - Print each word
+
+          //Get key
+          String key = words[k];
+          if(key.length()>2)
+          {
+            key = key.substring(0,2);//get first 2 characters only
+          }
+
+          //if first 2 chars of word exists in Hash (Reverse Index)
+          if (reverseIndex.containsKey(key))  
+          { 
+            //add song to CatalogPage
+              //System.out.println("\t" + "add song to CatalogPage"); // DEBUG
+
+              reverseIndex.get(key).addItem(catalog.getItem(i));      //Uses 2 chars as key
+              //reverseIndex.get(words[k]).addItem(catalog.getItem(i)); //Uses Full word as Key
+
+          }
+          else // this is a new key, add it to the HashMap
+          {
+            //System.out.println("\t"+ "add word to Hash ("+ words[k] +")"); // DEBUG
+            sortedKeys.add(key);//used later when saving the files to the peers.
+
+
+            //add song to new CatalogPage
+            CatalogPage capa = new CatalogPage();
+            capa.addItem(catalog.getItem(i));
+
+            //add first two chars of word to Hash ()
+            reverseIndex.put(key, capa);
+
+          }
+            
+        }
+
+      }
+
+      System.out.println("Indexing Done.");
+      //for each word in the "title", "album", "artist"
+
+        //store catalog item in tree
+
+
     }
 
     public void emit()
@@ -70,6 +169,15 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
 
           //peer.store(CatalogPage)
     } 
+
+    public void bulk()
+    {
+      //for each CatalogPage in TreeMap
+      
+        //generate guid
+
+        //save to file
+    }
 
     public int getChordSize()
     {
