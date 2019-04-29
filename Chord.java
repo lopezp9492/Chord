@@ -56,7 +56,8 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     int chordSize;
 
     //Extra Variables
-    TreeMap <String, CatalogPage> tm;
+    TreeMap <String, CatalogPage> tm;         // <key, [v1, v2, v3, ...]>
+    HashMap <Strin, Integer> pagesToProcess;  // <NameOfFile, pageCount> 
 
     //-----MY METHODS------
     public void map(long guid) throws RemoteException
@@ -367,7 +368,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
 
       chordSize = 1;
       tm = new TreeMap<String, CatalogPage>();
-
+      pagesToProcess = new HashMap<String, Integer<>();
 
         int j;
         // Initialize the variables

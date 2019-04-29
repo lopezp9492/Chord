@@ -1273,5 +1273,6 @@ public class DFS
         //wait until all pages are mapped
 
             //??WIP?? 
+            //should the new tree be in the chord?
     }
 }
