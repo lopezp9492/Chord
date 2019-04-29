@@ -264,7 +264,7 @@ public class DFS
 
     TreeMap <String, CatalogPage> reverseIndex;
     //HashMap <String, CatalogPage> reverseIndex;
-    //ArrayList<String> sortedKeys;
+    ArrayList<String> sortedKeys;
 
     
     //END DFS Variables
@@ -273,7 +273,7 @@ public class DFS
     {
         catalogItems = new ArrayList<CatalogItem>();
         local_metadata = new FilesJson();
-        reverseIndex = new TreeMap<String, CatalogPage>(3000);  //3k is the number of words in common use.
+        reverseIndex = new TreeMap<String, CatalogPage>();  //3k is the number of words in common use.
 
         //reverseIndex = new HashMap<String, CatalogPage>(3000); 	//3k is the number of words in common use.
         														// Oxford english dictionary contains 171k words in current use.
@@ -293,6 +293,24 @@ public class DFS
     }
 
     //WIP
+
+    //Testing Chord size Function
+    public void determineChordSize() throws Exception
+    {
+        //Print Initial Value
+        System.out.println("Chord Size: " + chord.getChordSize());
+
+        //Determine size
+        chord.onChordSize(chord.getId(), 0);
+
+        //Wait
+        System.out.println("Sleeping...");
+        Thread.sleep(500);
+
+
+        //Print new Value
+        System.out.println("Chord Size: " + chord.getChordSize());
+    }
 
     //Maps the file to a treemap
     public void map(String fileName)
