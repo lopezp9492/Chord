@@ -195,6 +195,12 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
       //else just store the new page
     public void store()
     {
+      //-----OutLine-----
+      //place received file into TreeMap
+        //if tree map already contains the key then combine received page with current page
+        //else just store the new page
+
+    //-----Implementation-----
       //place received file into TreeMap
         //if tree map already contains the key then combine received page with current page
         //else just store the new page
