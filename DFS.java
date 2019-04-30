@@ -1267,12 +1267,30 @@ public class DFS
             // locate successor
             ChordMessageInterface peer = this.locateSuccessor(guid);
             //map(guid) 
-            peer.map(guid);
+            peer.map("reverseIndex", guid);
         }
 
+        //WIP
         //wait until all pages are mapped
 
-            //??WIP?? 
-            //should the new tree be in the chord?
+            
+            //Q: How do we keep track of the pages that need to be done?
+            //A:    We have HashMap <string, int> pagesToProcess in the chord. <FileName, count>
+            //      Its counts how many pages are being processed for that particular FileName.
+            //      When counts reach zero on all peers we can move to the next step
+
+                    //Q: Where is the count increased?
+
+                    //Q: Where is the count decreased?
+
+            //Q: How do we check when all nodes have completed
+            //A:    Send a message around the ring. Using a funtion similar to onChordSize()
+            //  
+
+            //Q: Is there a concurrent access problem?
+            //A:    No, because each peer has its own HashMap
+            //      The coordinator keeps checking with the peers until they are done.
+
+
     }
 }
