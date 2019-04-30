@@ -17,9 +17,6 @@ import com.google.gson.Gson;
 import java.security.*;
 import java.math.BigInteger;
 
-
-
-
 /**
  * Chord extends from UnicastRemoteObject to support RMI.
  * It implements the ChordMessageInterface
@@ -167,16 +164,15 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
 
       }
 
+      onPageCompleted(fileName);
       System.out.println("Indexing Done.");
 
       // At this point the local file has been indexed
       // and stored in the TreeMap.
 
       // This process will be repeated for each page file in this peer.
-      // Once all local page files have been processed...
-
-      //Send() the the nodes to the correct peer 
-
+      // Once all local page files have been processed the coordinator calls Send().
+      // Send() function sends the nodes of TreeMap to the correct peer.
     }
 
     //Send all TreeMap nodes that dont belong in this peer.
@@ -218,7 +214,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
             //TODO: Test Compilation
 
             //send using RemoteInputFileStream
-            RemoteInputFileStream file = new RemoteInputFileStream(gson.toJson( entry.getValue() ) ); //WIP TODO: CONVERT emtry.getValue to String
+            RemoteInputFileStream file = new RemoteInputFileStream(gson.toJson( entry.getValue() ) ); //WIP test
             peer.store(file);
           }
         
@@ -333,10 +329,13 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
 
 
     }
-    public void onPageCompleted(String file) throws RemoteException
+    public void onPageCompleted(String fileName) throws RemoteException
     {
-
+      int count = pagesToProcess.get(fileName);
+      pagesToProcess.put(fileName, count-1);
     }
+
+
     //public void mapContext(int page, Mapper mapper, ChordMessageInterface coordinator, String file) throws RemoteException
     //{
 
