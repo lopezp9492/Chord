@@ -217,9 +217,17 @@ public class DFSCommand
             }
 
 
-            if(result[0].equals("chord"))// This command is for testing only
+            if(result[0].equals("size"))// This command is for testing only
             {
                 dfs.determineChordSize();
+            }
+            
+            if(result[0].equals("are"))// This command is for testing only
+            {
+                System.out.println("Testing: dfs.arePagesMapped()");
+                dfs.arePagesMapped();
+                System.out.println("Testing: done");
+
             }
 
             if(result[0].equals("quit"))
@@ -252,6 +260,8 @@ public class DFSCommand
 
         System.out.println("\tsearch (filter, count)(\"name or artist or album\" , count)");
         System.out.println("\tis     (Index Search)");
+        System.out.println("\tsize   (onChordSize())");
+        System.out.println("\tare    (arePagesMapped())");
 
         System.out.println("\t");
         System.out.println("\tquit (freezes?)");
