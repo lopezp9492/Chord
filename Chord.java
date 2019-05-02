@@ -55,7 +55,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     //Extra Variables
     TreeMap <String, CatalogPage> tm;         // <key, [v1, v2, v3, ...]> // aka <key,CataloPage>
     HashMap <String, Integer> pagesToProcess;  // <NameOfFile, pageCount> 
-    Boolean test;
+    Boolean mappedState;
 
 
     //-----MY METHODS------
@@ -305,13 +305,13 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     //WIP Testing
     public void arePagesMapped(long source, String fileName, Boolean state, int n) throws RemoteException
     {
-      System.out.println("arePagesMapped(...): " + this.test);
+      System.out.println("arePagesMapped(...): " + this.mappedState);
 
       //if its the initial call, then call the successor
       if(n==0)
       {
         //Boolean this_state = isPagesToProcessZero(fileName);
-        Boolean this_state = this.test;//DEBUGING this function //WIP
+        Boolean this_state = this.mappedState;//DEBUGING this function //WIP
         successor.arePagesMapped(source, fileName, this_state, ++n);
       }
       else
@@ -321,7 +321,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
 
         if(result == 0)// if result == 0 they are equal
         {
-          this.test = state;
+          this.mappedState = state;
         }
         else
         {
@@ -336,7 +336,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
           else// state == true //
           {
             //Boolean this_state = isPagesToProcessZero(fileName);
-            Boolean this_state = this.test;//DEBUGING this function // WIP
+            Boolean this_state = this.mappedState;//DEBUGING this function // WIP
             successor.arePagesMapped(source, fileName, this_state, ++n);
           }
         }
@@ -434,7 +434,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
       chordSize = 1;
       tm = new TreeMap<String, CatalogPage>();
       pagesToProcess = new HashMap<String, Integer>();
-      this.test = false;
+      this.mappedState = false;
 
         int j;
         // Initialize the variables
