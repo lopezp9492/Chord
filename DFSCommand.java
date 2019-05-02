@@ -221,13 +221,25 @@ public class DFSCommand
             {
                 dfs.determineChordSize();
             }
-            
+
             if(result[0].equals("are"))// This command is for testing only
             {
                 System.out.println("Testing: dfs.arePagesMapped()");
                 dfs.arePagesMapped();
                 System.out.println("Testing: done");
+            }
 
+            if(result[0].equals("set"))// This command is for testing only
+            {
+                System.out.println("Testing: dfs.setChordState()");
+                dfs.setChordState();
+                System.out.println("Testing: done");
+            }
+            if(result[0].equals("reset"))// This command is for testing only
+            {
+                System.out.println("Testing: dfs.resetChordState()");
+                dfs.resetChordState();
+                System.out.println("Testing: done");
             }
 
             if(result[0].equals("quit"))
@@ -262,6 +274,9 @@ public class DFSCommand
         System.out.println("\tis     (Index Search)");
         System.out.println("\tsize   (onChordSize())");
         System.out.println("\tare    (arePagesMapped())");
+        System.out.println("\tset    (set chord.mappedState =  true");
+        System.out.println("\treset   (set chord.mappedState =  false");
+
 
         System.out.println("\t");
         System.out.println("\tquit (freezes?)");

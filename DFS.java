@@ -318,6 +318,9 @@ public class DFS
         {
             Long id =chord.getId();
             chord.arePagesMapped(id,"music.json", true, 0 );
+
+            //Print final result
+            System.out.println("chord.mappedState: " + chord.mappedState); // DEBUG
         }
         catch(Exception e)
         {
@@ -1324,5 +1327,15 @@ public class DFS
             //      The coordinator keeps checking with the peers until they are done.
 
 
+    }
+
+    public void setChordState()
+    {
+        chord.mappedState = true;
+    }
+
+    public void resetChordState()
+    {
+        chord.mappedState = false;
     }
 }
