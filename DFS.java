@@ -312,6 +312,20 @@ public class DFS
         System.out.println("Chord Size: " + chord.getChordSize());
     }
 
+    public void arePagesMapped()
+    {
+        try
+        {
+            Long id =chord.getId();
+            chord.arePagesMapped(id,"music.json", true, 0 );
+        }
+        catch(Exception e)
+        {
+            System.out.println("Error: arePagesMapped: chord.getId(): ");
+        }
+
+    }
+
     //Maps the file to a treemap
     public void map(String fileName)
     {
@@ -1264,10 +1278,22 @@ public class DFS
         {
             //get guid
             Long guid = file.getPage(index).getGUID();
+
+            try
+            {
+                
             // locate successor
-            ChordMessageInterface peer = this.locateSuccessor(guid);
+            ChordMessageInterface peer = chord.locateSuccessor(guid);
+
             //map(guid) 
             peer.map("reverseIndex", guid);
+
+            }
+            catch(Exception e)
+            {
+                System.out.println("Error: runMapReduce: trying to locateSuccessor() failed");
+            }
+            
         }
 
         //WIP
@@ -1280,12 +1306,18 @@ public class DFS
             //      When counts reach zero on all peers we can move to the next step
 
                     //Q: Where is the count increased?
+                    //A:    Chord::map()
+
 
                     //Q: Where is the count decreased?
+                    //A:    function onPageCompleted().
+                    //Q: Where is onPageCompleted() called?
+                    //A:    Chord::map()
 
             //Q: How do we check when all nodes have completed
             //A:    Send a message around the ring. Using a funtion similar to onChordSize()
-            //  
+            //      DFS::arePagesMapped()
+            //      DFS::arePagesSorted()
 
             //Q: Is there a concurrent access problem?
             //A:    No, because each peer has its own HashMap

@@ -53,8 +53,10 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     int chordSize;
 
     //Extra Variables
-    TreeMap <String, CatalogPage> tm;         // <key, [v1, v2, v3, ...]>
-    HashMap <Strin, Integer> pagesToProcess;  // <NameOfFile, pageCount> 
+    TreeMap <String, CatalogPage> tm;         // <key, [v1, v2, v3, ...]> // aka <key,CataloPage>
+    HashMap <String, Integer> pagesToProcess;  // <NameOfFile, pageCount> 
+    Boolean test;
+
 
     //-----MY METHODS------
     public void map(String fileName, long guid) throws RemoteException
@@ -300,6 +302,59 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
       return this.chordSize;
     }
 
+    //WIP Testing
+    public void arePagesMapped(long source, String fileName, Boolean state, int n) throws RemoteException
+    {
+      System.out.println("arePagesMapped(...): " + this.test);
+
+      //if its the initial call, then call the successor
+      if(n==0)
+      {
+        //Boolean this_state = isPagesToProcessZero(fileName);
+        Boolean this_state = this.test;//DEBUGING this function //WIP
+        successor.arePagesMapped(source, fileName, this_state, ++n);
+      }
+      else
+      {
+        //compare the guids
+        int result = Long.compare(source, this.guid);
+
+        if(result == 0)// if result == 0 they are equal
+        {
+          this.test = state;
+        }
+        else
+        {
+          //if the previous state was incomplete then 
+          if(!state)
+          {
+            //passe it along to the other peers
+            successor.arePagesMapped(source, fileName, state, ++n);
+
+          }
+          //else the previous state was positive , check the local state.
+          else// state == true //
+          {
+            //Boolean this_state = isPagesToProcessZero(fileName);
+            Boolean this_state = this.test;//DEBUGING this function // WIP
+            successor.arePagesMapped(source, fileName, this_state, ++n);
+          }
+        }
+      }
+    }
+
+    private Boolean isPagesToProcessZero(String fileName)
+    {
+      if(pagesToProcess.get(fileName) == 0)
+      {
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    }
+
     //-----END MY METHODS-----
 
     //-----NEW METHODS-----
@@ -326,9 +381,8 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
           successor.onChordSize(source, ++n);
         }
       }
-
-
     }
+
     public void onPageCompleted(String fileName) throws RemoteException
     {
       int count = pagesToProcess.get(fileName);
@@ -379,7 +433,8 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
 
       chordSize = 1;
       tm = new TreeMap<String, CatalogPage>();
-      pagesToProcess = new HashMap<String, Integer<>();
+      pagesToProcess = new HashMap<String, Integer>();
+      this.test = false;
 
         int j;
         // Initialize the variables
