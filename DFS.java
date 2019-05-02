@@ -297,15 +297,15 @@ public class DFS
     //Testing Chord size Function
     public void determineChordSize() throws Exception
     {
-        //Print Initial Value
-        System.out.println("Chord Size: " + chord.getChordSize());
+        //Print Initial Value //DEBUG
+        //System.out.println("Initial Value: " + chord.getChordSize()); //DEBUG
 
         //Determine size
         chord.onChordSize(chord.getId(), 0);
 
-        //Wait
-        System.out.println("Sleeping...");
-        Thread.sleep(500);
+        //Wait //DEBUG
+        //System.out.println("Sleeping..."); //DEBUG
+        //Thread.sleep(500); //DEBUG
 
 
         //Print new Value
@@ -1281,7 +1281,7 @@ public class DFS
 
             try
             {
-                
+
             // locate successor
             ChordMessageInterface peer = chord.locateSuccessor(guid);
 
