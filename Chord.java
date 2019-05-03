@@ -178,6 +178,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     }
 
     //Send all TreeMap nodes that dont belong in this peer.
+    //WIP remove node once it is sent
     public void sendAll()
     {
 
