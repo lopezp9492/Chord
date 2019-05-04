@@ -291,11 +291,30 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
 
     public void bulk()
     {
+      //-----OutLine-----
       //for each CatalogPage in TreeMap
-
         //generate guid
+        //save to file //OPTIONAL: FITER OUT GUIDS THAT DONT BELONG IN THIS PEER
 
-        //save to file
+
+
+      //-----Implementation-----
+      for(Map.Entry<String,CatalogPage> entry : tm.entrySet()) 
+      {
+        String k = entry.getKey();
+        Long guid = md5( k + "reverseIndex" + k );
+        Gson gson = new Gson();
+        String jsonString = gson.toJson(entry.getValue()); // Convert CatalogPage to Json
+        try 
+        {
+          this.put(guid,jsonString);
+        } 
+        catch (RemoteException e) 
+        {
+        e.printStackTrace();
+        }
+        
+      }
     }
 
     public int getChordSize()
