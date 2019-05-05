@@ -1303,6 +1303,7 @@ public class DFS
         }
 
         //wait until all pages are mapped
+        System.out.println("waiting on peers to finish mapping.");
         Boolean done  = false;
         while(!done)
         {
@@ -1322,16 +1323,19 @@ public class DFS
         //WIP
 
         //All peers sendAll()
+        System.out.println("Calling Peers to sendAll()");
+
 
         //wait until all keys are stored at their proper peer.
+        System.out.println("waiting on peers to finish sending.");
+
 
         //All peers bulk() //Save all nodes in TreeMap as their own file). 
+        System.out.println("Calling Peers to bulk()");
 
 
-        
-
-
-
+        //Done
+        System.out.println("runMapReduce: done");
     }
 
     public void setChordState()
