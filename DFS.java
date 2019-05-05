@@ -742,7 +742,7 @@ public class DFS
 
                 // DEBUG
                 //System.out.println("i + 1 = " + (i+1) );
-                System.out.println("\tpage_size = " + page_size);
+                System.out.println("\n\tpage_size = " + page_size);
 
                 // Hash each page (name + time stamp) to get its GUID
                 Long timeStamp = System.currentTimeMillis();
@@ -764,7 +764,7 @@ public class DFS
             else if(i == catalogItems.size()-1 )
             {
                 // DEBUG
-                System.out.println("\tLast Page: smaller than " + this.items_per_page); // DEBUG
+                System.out.println("\n\tLast Page: smaller than " + this.items_per_page); // DEBUG
                 System.out.println("\tpage_size = " + page_size); // DEBUG
                 //System.out.println("i + 1 = " + (i+1) ); // DEBUG
 
