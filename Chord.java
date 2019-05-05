@@ -56,6 +56,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     TreeMap <String, CatalogPage> tm;         // <key, [v1, v2, v3, ...]> // aka <key,CataloPage>
     HashMap <String, Integer> pagesToProcess;  // <NameOfFile, pageCount> 
     Boolean mappedState;
+    Boolean sentState;
 
 
     //-----MY METHODS------
@@ -206,6 +207,9 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
         //else skip to next node
 
       //-----Implementation-----
+      String TAG = "sendAll";
+      System.out.print(TAG + "(): + ID: " + this.getId() );
+
       Gson gson = new Gson();
 
       //for each node in TreeMap
@@ -507,6 +511,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
       tm = new TreeMap<String, CatalogPage>();
       pagesToProcess = new HashMap<String, Integer>();
       this.mappedState = false;
+      this.sentState = false;
 
         int j;
         // Initialize the variables
