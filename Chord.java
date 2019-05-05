@@ -341,7 +341,9 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     //WIP Testing
     public void arePagesMapped(long source, String fileName, Boolean state, int n) throws RemoteException
     {
-      System.out.println("chord.arePagesMapped(): id: " + this.guid + "state: " + this.mappedState);
+      String TAG = "arePagesMapped";
+
+      System.out.println(TAG + "(): id: " + this.guid);
 
       //if its the initial call, then call the successor
       if(n==0)
@@ -371,7 +373,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
           else// state == true //
           {
             this.mappedState = isPagesToProcessZero(fileName);
-            //Boolean this_state = this.mappedState; // DEBUG
+            System.out.println(TAG + "(): id: " + this.guid + ": state: " + this.mappedState);
             successor.arePagesMapped(source, fileName, this.mappedState, ++n);
           }
         }
