@@ -208,7 +208,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
 
       //-----Implementation-----
       String TAG = "sendAll";
-      System.out.print(TAG + "(): + ID: " + this.getId() );
+      System.out.print(TAG + "()");
 
       Gson gson = new Gson();
 
