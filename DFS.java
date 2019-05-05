@@ -1315,7 +1315,9 @@ public class DFS
             }
             catch(Exception e)
             {
-                System.out.println("Error: arePagesMapped: ");
+                System.out.println( TAG + ": ERROR : 1st delay failed : arePagesMapped.");
+                done = true;
+                return;
             }
         }
         System.out.println(TAG + ": mapping done."); // DEBUG
@@ -1343,7 +1345,9 @@ public class DFS
             }
             catch(Exception e)
             {
-                System.out.println( TAG + ": ERROR : second delay failed");
+                System.out.println( TAG + ": ERROR : 2nd delay failed : arePagesSent.");
+                done = true;
+                return;
             }
         }
 
