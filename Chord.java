@@ -343,7 +343,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     {
       String TAG = "arePagesMapped";
 
-      System.out.println(TAG + "(): id: " + this.guid);
+      //System.out.println(TAG + "(): id: " + this.guid); // DEBUG
 
       //if its the initial call, then call the successor
       if(n==0)
@@ -356,9 +356,10 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
         //compare the guids
         int result = Long.compare(source, this.guid);
 
-        if(result == 0)// if result == 0 they are equal
+        if(result == 0)// if result == 0 they are equal // this is the start of the chord
         {
           this.mappedState = state;
+          System.out.println(TAG + "(): id: " + this.guid + ": state: " + this.mappedState);
         }
         else
         {
@@ -383,8 +384,8 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     //WIP: Testing
     private Boolean isPagesToProcessZero(String fileName)
     {
-      String TAG = "isPagesToProcessZero: ";
-      System.out.println(TAG + "( "+ fileName +" ):" + pagesToProcess.get(fileName)); // DEBUG
+      String TAG = "isPagesToProcessZero";
+      //System.out.println(TAG + "("+ fileName +"): result = " + pagesToProcess.get(fileName)); // DEBUG
 
       if(pagesToProcess.get(fileName) == 0)
       {
