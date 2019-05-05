@@ -1271,8 +1271,6 @@ public class DFS
             System.out.println(TAG + ": error reading metadata");
         }
 
-        // Count number of songs
-        int songs_found = 0;
 
         //for each page in music.json
             //get guid
