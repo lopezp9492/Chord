@@ -316,6 +316,9 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
 
     public void bulk()
     {
+      String TAG = "bulk";
+      System.out.println(TAG + "()");
+
       //-----OutLine-----
       //for each CatalogPage in TreeMap
         //generate guid
@@ -338,10 +341,11 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
           try 
           {
             this.put(guid,jsonString);
+            System.out.println(TAG + ": key = " + k ); // DEBUG
           } 
           catch (RemoteException e) 
           {
-          e.printStackTrace();
+            e.printStackTrace();
           }
         }
         else
