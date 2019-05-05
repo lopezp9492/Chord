@@ -188,7 +188,8 @@ public class CatalogPage
 
     public void setOrder(String fileName)
     {
-        System.out.println("setOrder: fileName = " + fileName);
+        //System.out.println("setOrder: fileName = " + fileName); //DEBUG
+        System.out.println("\t"); //Output Formatting 
 
         //Set Order 
         switch (fileName)
