@@ -198,6 +198,8 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     //WIP remove node once it is sent
     public void sendAll()
     {
+      String TAG = "sendAll";
+      System.out.println(TAG + "()");
 
       //-----OutLine-----
       //for each node in TreeMap
@@ -207,8 +209,6 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
         //else skip to next node
 
       //-----Implementation-----
-      String TAG = "sendAll";
-      System.out.print(TAG + "()");
 
       Gson gson = new Gson();
 
@@ -218,6 +218,8 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
         //determine guid
         String k = entry.getKey();
         Long guid = md5( k + "reverseIndex" + k );
+        System.out.println(TAG + ": key = " + k); // DEBUG
+
 
         try
         {
@@ -244,7 +246,8 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
         }
         catch(Exception e)
         {
-            System.out.println("something bad happened in sendAll() function");
+            System.out.println(TAG + "(): ERROR : could not send.");
+            return;
         }
       
       }//END for each node in TreeMap
