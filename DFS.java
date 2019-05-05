@@ -1319,18 +1319,24 @@ public class DFS
                 System.out.println("Error: arePagesMapped: ");
             }
         }
+        System.out.println("done: mapping."); // DEBUG
 
+
+        //WIP: Work In Progress
+
+        /**
 
         //All peers sendAll()
         System.out.println("Calling Peers to sendAll()");
         chord.callSuccesorToSendAll(chord.getId(), 0);
 
-        //WIP: Work In Progress
         //wait until all keys are stored at their proper peer.
         System.out.println("waiting on peers to finish sending.");
         done  = false;
         while(!done)
         {
+            Thread.sleep(2000); // Sleep to prevent sending too many messages while checking the chord state
+
             try
             {
                 Long id =chord.getId();
@@ -1351,6 +1357,8 @@ public class DFS
 
         //Done
         System.out.println("runMapReduce: done");
+
+        **/
     }
 
     public void setChordState()
