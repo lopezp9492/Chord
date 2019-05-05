@@ -1302,30 +1302,24 @@ public class DFS
 
         //WIP
         //wait until all pages are mapped
+        Boolean done  = false;
+        while(!done)
+        {
+            try
+            {
+                Long id =chord.getId();
+                chord.arePagesMapped(id,"music.json", true, 0 );
+                Thread.sleep(500); // Sleep to prevent sending too many messages while checking the chord state
+                done = chord.mappedState;
+            }
+            catch(Exception e)
+            {
+                System.out.println("Error: arePagesMapped: chord.getId(): ");
+            }
+        }
 
-            
-            //Q: How do we keep track of the pages that need to be done?
-            //A:    We have HashMap <string, int> pagesToProcess in the chord. <FileName, count>
-            //      Its counts how many pages are being processed for that particular FileName.
-            //      When counts reach zero on all peers we can move to the next step
+        
 
-                    //Q: Where is the count increased?
-                    //A:    Chord::map()
-
-
-                    //Q: Where is the count decreased?
-                    //A:    function onPageCompleted().
-                    //Q: Where is onPageCompleted() called?
-                    //A:    Chord::map()
-
-            //Q: How do we check when all nodes have completed
-            //A:    Send a message around the ring. Using a funtion similar to onChordSize()
-            //      DFS::arePagesMapped()
-            //      DFS::arePagesSorted()
-
-            //Q: Is there a concurrent access problem?
-            //A:    No, because each peer has its own HashMap
-            //      The coordinator keeps checking with the peers until they are done.
 
 
     }
