@@ -271,6 +271,7 @@ public class DFSCommand
         System.out.println("\tleave");
 
         System.out.println("\tcreate (loads music.json into DFS)");
+        System.out.println("\tci     (create reverse index)(single node version)(testing only)");
         System.out.println("\tlist   (displays files in DFS)");
         System.out.println("\tread   (reads page 1 of music.json)");
 
@@ -288,7 +289,7 @@ public class DFSCommand
 
 
         System.out.println("\t");
-        System.out.println("\tquit (freezes?)");
+        System.out.println("\tquit   (freezes?)");
     }
 
     
