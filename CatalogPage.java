@@ -189,25 +189,25 @@ public class CatalogPage
     public void setOrder(String fileName)
     {
         //System.out.println("setOrder: fileName = " + fileName); //DEBUG
-        System.out.println("\t"); //Output Formatting 
+        //System.out.print("\t"); //Output Formatting 
 
         //Set Order 
         switch (fileName)
         {
             case "artist.json":
-                System.out.println("setOrder: byArtist");
+                //System.out.println("setOrder: byArtist");
                 this.order = Order.byArtist;
                 break;
             case "album.json":
-                System.out.println("setOrder: byAlbum");
+                //System.out.println("setOrder: byAlbum");
                 this.order = Order.byAlbum;
                 break;
             case "songs.json":
-                System.out.println("setOrder: bySong");
+                //System.out.println("setOrder: bySong");
                 this.order = Order.bySong;
                 break;
             default:
-                System.out.println("setOrder: UNSORTED");
+                //System.out.println("setOrder: UNSORTED");
                 this.order = Order.UNSORTED;
             break;
         }
