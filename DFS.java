@@ -1289,7 +1289,7 @@ public class DFS
             ChordMessageInterface peer = chord.locateSuccessor(guid);
 
             //map(guid) 
-            peer.map("reverseIndex", guid);
+            peer.map("music.json", guid); // TODO: fileName should come from outside
 
             }
             catch(Exception e)
@@ -1302,12 +1302,11 @@ public class DFS
         //wait until all pages are mapped
         //Currently Debugging
 
-        /**
         System.out.println("waiting on peers to finish mapping.");
         Boolean done  = false;
         while(!done)
         {
-            Thread.sleep(2000); // Sleep to prevent sending too many messages while checking the chord state
+            Thread.sleep(3000); // Sleep to prevent sending too many messages while checking the chord state
             try
             {
                 Long id = chord.getId();
@@ -1321,7 +1320,7 @@ public class DFS
             }
         }
         System.out.println("done: mapping."); // DEBUG
-        **/
+        
 
 
         //WIP: Work In Progress
