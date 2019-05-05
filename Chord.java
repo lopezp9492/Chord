@@ -330,9 +330,8 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
       //if its the initial call, then call the successor
       if(n==0)
       {
-        //Boolean this_state = isPagesToProcessZero(fileName);
-        Boolean this_state = this.mappedState;//DEBUGING this function //WIP
-        successor.arePagesMapped(source, fileName, this_state, ++n);
+        this.mappedState = isPagesToProcessZero(fileName);
+        successor.arePagesMapped(source, fileName, this.mappedState, ++n);
       }
       else
       {
@@ -355,9 +354,9 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
           //else the previous state was positive , check the local state.
           else// state == true //
           {
-            //Boolean this_state = isPagesToProcessZero(fileName);
-            Boolean this_state = this.mappedState;//DEBUGING this function // WIP
-            successor.arePagesMapped(source, fileName, this_state, ++n);
+            this.mappedState = isPagesToProcessZero(fileName);
+            //Boolean this_state = this.mappedState; // DEBUG
+            successor.arePagesMapped(source, fileName, this.mappedState, ++n);
           }
         }
       }
