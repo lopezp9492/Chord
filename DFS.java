@@ -438,7 +438,7 @@ public class DFS
         metadataTimeStamp = (long)0; //zero to make system refresh metadata
         long guid = md5("Metadata");
         ChordMessageInterface peer = chord.locateSuccessor(guid);
-        System.out.println("\tSaving Metadata to peer: " + peer.getId()); // DEBUG
+        System.out.println("\n\tSaving Metadata to peer: " + peer.getId()); // DEBUG
         
         Gson gson = new Gson();
         peer.put(guid, gson.toJson(filesJson));
