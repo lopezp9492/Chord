@@ -487,6 +487,34 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
       }
     }
 
+    public void callSuccesorToBulk(long source, int n) throws RemoteException
+    {
+      String TAG = "callSuccesorToBulk";
+      System.out.println(TAG + "("+ source + ", " + n + ")" );  // DEBUG
+      System.out.println(TAG + "(): this.id: " + this.guid );   // DEBUG
+
+      if(n==0)//if this is the first message
+      {
+        successor.callSuccesorToBulk(source, ++n);
+        this.bulk();
+      }
+      else
+      {
+        int result = Long.compare(source, this.guid);
+
+        if(result == 0)// if result == 0 the guids are equal
+        {
+          // We reached the start of the chord.
+          // Stop sending messages.
+        }
+        else
+        {
+          successor.callSuccesorToBulk(source, ++n);
+          this.bulk();
+        }
+      }
+    }
+
     public void callSuccesorToSendAll(long source, int n) throws RemoteException
     {
       //System.out.println("source id: " + source);     // DEBUG
