@@ -292,8 +292,6 @@ public class DFS
         
     }
 
-    //WIP
-
     //Testing Chord size Function
     public void determineChordSize() throws Exception
     {
@@ -1229,9 +1227,10 @@ public class DFS
         System.out.println("guid: "+ guid); // DEBUG
     }
 
+    //WIP: Work In Progress
     //Precondition: create(music.json) was called before.
     //All unsorted pages have been saved to the peers in the chord.
-    public void runMapReduce()
+    public void runMapReduce() throws Exception
     {
         String TAG = "runMapReduce()";
         //-----Outline-----
@@ -1320,12 +1319,12 @@ public class DFS
             }
         }
 
-        //WIP: Work In Progress
 
         //All peers sendAll()
         System.out.println("Calling Peers to sendAll()");
         chord.callSuccesorToSendAll(chord.getId(), 0);
 
+        //WIP: Work In Progress
         //wait until all keys are stored at their proper peer.
         System.out.println("waiting on peers to finish sending.");
         done  = false;
