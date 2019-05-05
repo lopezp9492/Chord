@@ -1350,8 +1350,10 @@ public class DFS
                 return;
             }
         }
+        System.out.println("sendAll() Done.");
 
 
+        /**
         //All peers bulk() //Save all nodes in TreeMap as their own file). 
         System.out.println("Calling Peers to bulk()");
 
