@@ -48,20 +48,20 @@ public class CatalogPage
      //returns the first letter of the first item
      public String getFirstLetter()
      {
-        System.out.println("order: " + this.order);
+        //System.out.println("order: " + this.order);
         switch(order)
             {
             case byArtist:
-                System.out.println("\treturning: " + items.get(0).getArtist().substring(0,1));
+                //System.out.println("\treturning: " + items.get(0).getArtist().substring(0,1));
                 return items.get(0).getArtist().substring(0,1);
             case byAlbum:
-                System.out.println("\treturning: " + items.get(0).getAlbum().substring(0,1));
+                //System.out.println("\treturning: " + items.get(0).getAlbum().substring(0,1));
                 return items.get(0).getAlbum().substring(0,1);
             case bySong:
-                System.out.println("\treturning: " + items.get(0).getTitle().substring(0,1));
+                //System.out.println("\treturning: " + items.get(0).getTitle().substring(0,1));
                 return items.get(0).getTitle().substring(0,1);
             default:
-                System.out.println("\treturning: unsorted");
+                //System.out.println("\treturning: unsorted");
                 //System.out.println("Unsorted: " + items.get(i).artist.name);
                 return "?";
             }
