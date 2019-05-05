@@ -1353,6 +1353,7 @@ public class DFS
         System.out.println("sendAll() Done.");
 
 
+        //TODO:  filter nodes in bulk
         /**
         //All peers bulk() //Save all nodes in TreeMap as their own file). 
         System.out.println("Calling Peers to bulk()");
