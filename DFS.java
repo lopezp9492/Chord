@@ -1320,14 +1320,29 @@ public class DFS
             }
         }
 
-        //WIP
+        //WIP: Work In Progress
 
         //All peers sendAll()
         System.out.println("Calling Peers to sendAll()");
-
+        chord.callSuccesorToSendAll(chord.getId(), 0);
 
         //wait until all keys are stored at their proper peer.
         System.out.println("waiting on peers to finish sending.");
+        done  = false;
+        while(!done)
+        {
+            try
+            {
+                Long id =chord.getId();
+                chord.arePagesMapped(id,"music.json", true, 0 );
+                Thread.sleep(500); // Sleep to prevent sending too many messages while checking the chord state
+                done = chord.mappedState;
+            }
+            catch(Exception e)
+            {
+                System.out.println("Error: arePagesMapped: chord.getId(): ");
+            }
+        }
 
 
         //All peers bulk() //Save all nodes in TreeMap as their own file). 
