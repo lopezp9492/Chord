@@ -48,7 +48,7 @@ public class CatalogPage
      //returns the first letter of the first item
      public String getFirstLetter()
      {
-        //System.out.println("order: " + this.order);
+        System.out.println("\torder: " + this.order);
         switch(order)
             {
             case byArtist:
