@@ -249,6 +249,8 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
       
       }//END for each node in TreeMap
 
+      this.sentState = true; // TODO: generalize, use a HashMap similar to arePagesMapped();
+
     }//END sendAll()
 
     //Send an item  "key, <s1, s2, s3...> " aka CatalogPage
@@ -343,6 +345,45 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     }
 
     //WIP Testing
+    public void arePagesSent(long source, String fileName, Boolean state, int n) throws RemoteException
+    {
+      String TAG = "arePagesSent";
+      System.out.println(TAG + "(): id: " + this.guid); // DEBUG
+
+      //if its the initial call, then call the successor
+      if(n==0)
+      {
+        successor.arePagesSent(source, fileName, this.sentState, ++n);
+      }
+      else
+      {
+        //compare the guids
+        int result = Long.compare(source, this.guid);
+
+        if(result == 0)// if result == 0 they are equal // this is the start of the chord
+        {
+          this.sentState = state;
+          System.out.println(TAG + "(): id: " + this.guid + ": state: " + this.sentState);
+        }
+        else
+        {
+          //if the previous state was incomplete then 
+          if(!state)
+          {
+            //passe it along to the other peers
+            successor.arePagesSent(source, fileName, state, ++n);
+          }
+          //else the previous state was positive , check the local state and pass to the successor.
+          else// state == true //
+          {
+            System.out.println(TAG + "(): id: " + this.guid + ": state: " + this.sentState);
+            successor.arePagesSent(source, fileName, this.sentState, ++n);
+          }
+        }
+      }
+    }
+
+
     public void arePagesMapped(long source, String fileName, Boolean state, int n) throws RemoteException
     {
       String TAG = "arePagesMapped";
