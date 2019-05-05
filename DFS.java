@@ -1358,9 +1358,11 @@ public class DFS
         //All peers bulk() //Save all nodes in TreeMap as their own file). 
         System.out.println("Calling Peers to bulk()");
         chord.callSuccesorToBulk(chord.getId(), 0);
+        System.out.println("bulk() Done");
+
 
         //Done
-        System.out.println("runMapReduce: done");
+        System.out.println("runMapReduce: Done");
     }
 
     public void setChordState()

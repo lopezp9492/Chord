@@ -276,12 +276,21 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
       //receive data
       CatalogPage catalogPage = new CatalogPage();
       try {
+
+        System.out.println(TAG + ": connect()"); // DEBUG
         rawdata.connect();
+
+        System.out.println(TAG + ": scannner(rawdata)"); // DEBUG
         Scanner scan = new Scanner(rawdata);
         scan.useDelimiter("\\A");
+
+        System.out.println(TAG + ": scan.next()"); // DEBUG
         String data = scan.next();
+
+        System.out.println(TAG + ": gson.fromJson(data, CatalogPage.class) ");// DEBUG
         Gson gson = new Gson();
         catalogPage = gson.fromJson(data, CatalogPage.class);
+
       } catch (Exception e)
       {
           System.out.println(TAG + ": ERROR : receiving data (connect, scan, convert)");
