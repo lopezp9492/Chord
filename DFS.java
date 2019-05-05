@@ -1306,16 +1306,17 @@ public class DFS
         Boolean done  = false;
         while(!done)
         {
+            Thread.sleep(2000); // Sleep to prevent sending too many messages while checking the chord state
             try
             {
-                Long id =chord.getId();
+                Long id = chord.getId();
                 chord.arePagesMapped(id,"music.json", true, 0 );
-                Thread.sleep(500); // Sleep to prevent sending too many messages while checking the chord state
+                
                 done = chord.mappedState;
             }
             catch(Exception e)
             {
-                System.out.println("Error: arePagesMapped: chord.getId(): ");
+                System.out.println("Error: arePagesMapped: ");
             }
         }
 
