@@ -260,7 +260,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
         catalogPage = gson.fromJson(data, CatalogPage.class);
       } catch (Exception e)
       {
-          throw(new RemoteException(":error in store(): \\_(^_^)_/"));
+          throw(new RemoteException(":error in store():"));
       }
       //place received file into TreeMap
 
@@ -362,8 +362,12 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
       }
     }
 
+    //WIP: Testing
     private Boolean isPagesToProcessZero(String fileName)
     {
+      String TAG = "isPagesToProcessZero: ";
+      System.out.println(TAG + "( "+ fileName +" ):" + pagesToProcess.get(fileName)); // DEBUG
+
       if(pagesToProcess.get(fileName) == 0)
       {
         return true;
