@@ -59,6 +59,28 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
 
 
     //-----MY METHODS------
+
+    //This function increases the counter on pages that need to be processed
+    //PtP = Pages to Process
+    private void increasePtPCount(String fileName)
+    {
+      String TAG = "increasePagesCount";
+      System.out.println(TAG + "(" + fileName + ")");
+
+      if(pagesToProcess.containsKey(fileName))
+      {
+        int count = pagesToProcess.get(fileName);
+        pagesToProcess.put(fileName, count+1);
+        System.out.println(TAG + "(): count = " + pagesToProcess.get(fileName) ); // DEBUG
+      }
+      else
+      {
+        pagesToProcess.put(fileName, 1);
+        System.out.println(TAG + "(): count = " + pagesToProcess.get(fileName) ); // DEBUG
+      }
+    }
+
+
     public void map(String fileName, long guid) throws RemoteException
     {
 
@@ -76,16 +98,8 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
 
       //---Implementation---
 
-      // update pagesToProcess
-      if(pagesToProcess.containsKey(fileName))
-      {
-        int count = pagesToProcess.get(fileName);
-        pagesToProcess.put(fileName, count+1);
-      }
-      else
-      {
-        pagesToProcess.put(fileName, 1);
-      }
+      // update pagesToProcess PTP 
+      increasePtPCount(fileName);
 
       // load CatalogPage
       RemoteInputFileStream rawdata = null;
@@ -435,8 +449,11 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
 
     public void onPageCompleted(String fileName) throws RemoteException
     {
+      String TAG = "onPageCompleted";
+      System.out.println(TAG  + "(" + fileName + ")"); // DEBUG
       int count = pagesToProcess.get(fileName);
       pagesToProcess.put(fileName, count-1);
+      System.out.println(TAG + ": count = "+ pagesToProcess.get(fileName)); // DEBUG
     }
 
 
