@@ -1236,9 +1236,11 @@ public class DFS
         String TAG = "runMapReduce()";
         //-----Outline-----
         //read music.json metadata
-        //for each page in music.json
-            //peer = locateSuccessor(page.guid)
-            //peer.map(guid)
+
+        //All peers map:
+            //for each page in music.json
+                //peer = locateSuccessor(page.guid)
+                //peer.map(guid)
 
         //wait until all pages are mapped
 
@@ -1300,7 +1302,6 @@ public class DFS
             
         }
 
-        //WIP
         //wait until all pages are mapped
         Boolean done  = false;
         while(!done)
@@ -1317,6 +1318,15 @@ public class DFS
                 System.out.println("Error: arePagesMapped: chord.getId(): ");
             }
         }
+
+        //WIP
+
+        //All peers sendAll()
+
+        //wait until all keys are stored at their proper peer.
+
+        //All peers bulk() //Save all nodes in TreeMap as their own file). 
+
 
         
 
