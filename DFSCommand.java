@@ -235,10 +235,18 @@ public class DFSCommand
                 dfs.setChordState();
                 System.out.println("Testing: done");
             }
+
             if(result[0].equals("reset"))// This command is for testing only
             {
                 System.out.println("Testing: dfs.resetChordState()");
                 dfs.resetChordState();
+                System.out.println("Testing: done");
+            }
+
+            if(result[0].equals("run"))
+            {
+                System.out.println("Testing: dfs.runMapReduce()");
+                dfs.runMapReduce();
                 System.out.println("Testing: done");
             }
 
