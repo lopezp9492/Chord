@@ -245,9 +245,9 @@ public class DFSCommand
 
             if(result[0].equals("run"))
             {
-                System.out.println("Testing: dfs.runMapReduce()");
+                System.out.println("DFSCommand: dfs.runMapReduce()");
                 dfs.runMapReduce();
-                System.out.println("Testing: done");
+                System.out.println("DFSCommand: dfs.runMapReduce(): done");
             }
 
             if(result[0].equals("quit"))

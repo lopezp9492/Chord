@@ -1300,8 +1300,6 @@ public class DFS
         }
 
         //wait until all pages are mapped
-        //Currently Debugging
-
         System.out.println("waiting on peers to finish mapping.");
         Boolean done  = false;
         while(!done)
@@ -1319,7 +1317,7 @@ public class DFS
                 System.out.println("Error: arePagesMapped: ");
             }
         }
-        System.out.println("done: mapping."); // DEBUG
+        System.out.println(TAG + ": mapping done."); // DEBUG
         
 
 
