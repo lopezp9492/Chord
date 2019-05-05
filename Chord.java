@@ -83,6 +83,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
 
     public void map(String fileName, long guid) throws RemoteException
     {
+      String TAG = "map";
 
       //---Outline---
       //update pagesToProcess
@@ -97,6 +98,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
 
 
       //---Implementation---
+      System.out.println(TAG + "(" + fileName + ", " + guid + ")");
 
       // update pagesToProcess PTP 
       increasePtPCount(fileName);
@@ -181,7 +183,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
       }
 
       onPageCompleted(fileName);
-      System.out.println("Indexing Done.");
+      System.out.println(TAG + "(" + fileName + ", " + guid + ") Done.\n");
 
       // At this point the local file has been indexed
       // and stored in the TreeMap.
