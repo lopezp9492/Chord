@@ -1242,12 +1242,13 @@ public class DFS
 
         //wait until all pages are mapped
 
-        //for each key in TreeMap at every peer
-            //send entry set to proper peer. //sendAll() and store() 
+        //All peers sendAll()
 
         //wait until all keys are stored at their proper peer.
 
-        //Bulk // (Save all nodes in TreeMap as their own file). 
+        //All peers bulk() //Save all nodes in TreeMap as their own file). 
+
+
 
         //-----Implementation-----
         //read music.json metadata
