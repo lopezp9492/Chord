@@ -1299,7 +1299,8 @@ public class DFS
             
         }
 
-        //wait until all pages are mapped
+        // Wait until all pages are mapped
+        // 1st Delay
         System.out.println("waiting on peers to finish mapping.");
         Boolean done  = false;
         while(!done)
@@ -1322,14 +1323,12 @@ public class DFS
 
 
         //WIP: Work In Progress
-
-        /**
-
         //All peers sendAll()
         System.out.println("Calling Peers to sendAll()");
         chord.callSuccesorToSendAll(chord.getId(), 0);
 
-        //wait until all keys are stored at their proper peer.
+        // Wait until all keys are stored at their proper peer.
+        // 2nd Delay
         System.out.println("waiting on peers to finish sending.");
         done  = false;
         while(!done)
@@ -1339,13 +1338,12 @@ public class DFS
             try
             {
                 Long id =chord.getId();
-                chord.arePagesMapped(id,"music.json", true, 0 );
-                Thread.sleep(500); // Sleep to prevent sending too many messages while checking the chord state
-                done = chord.mappedState;
+                chord.arePagesSent(id,"music.json", true, 0 );
+                done = chord.sentState;
             }
             catch(Exception e)
             {
-                System.out.println("Error: arePagesMapped: chord.getId(): ");
+                System.out.println( TAG + ": ERROR : second delay failed");
             }
         }
 
