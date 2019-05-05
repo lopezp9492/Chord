@@ -264,6 +264,8 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
       //else just store the new page
     public void store(RemoteInputFileStream rawdata) throws RemoteException
     {
+      String TAG = "store";
+
       //-----OutLine-----
       //receive data
       //place received file into TreeMap
@@ -282,6 +284,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
         catalogPage = gson.fromJson(data, CatalogPage.class);
       } catch (Exception e)
       {
+          System.out.println(TAG + ": ERROR : receiving data (connect, scan, convert)");
           throw(new RemoteException(":error in store():"));
       }
       //place received file into TreeMap
@@ -327,15 +330,25 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
         Long guid = md5( k + "reverseIndex" + k );
         Gson gson = new Gson();
         String jsonString = gson.toJson(entry.getValue()); // Convert CatalogPage to Json
-        try 
+
+        //filter // store only CatalogPages that belong to this peer
+        int result = Long.compare(guid, this.guid);
+        if(result == 0 )
         {
-          this.put(guid,jsonString);
-        } 
-        catch (RemoteException e) 
-        {
-        e.printStackTrace();
+          try 
+          {
+            this.put(guid,jsonString);
+          } 
+          catch (RemoteException e) 
+          {
+          e.printStackTrace();
+          }
         }
-        
+        else
+        {
+          // The node does not belong in this peer
+          // Ignore it.
+        }
       }
     }
 
