@@ -411,6 +411,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
       if(n==0)//if this is the first message
       {
         successor.callSuccesorToSendAll(source, ++n);
+        this.sendAll();
       }
       else
       {
