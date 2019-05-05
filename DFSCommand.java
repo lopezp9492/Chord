@@ -280,10 +280,11 @@ public class DFSCommand
 
         System.out.println("\tsearch (filter, count)(\"name or artist or album\" , count)");
         System.out.println("\tis     (Index Search)");
-        System.out.println("\tsize   (onChordSize())");
+        System.out.println("\tsize   (onChordSize() )");
         System.out.println("\tare    (arePagesMapped())");
         System.out.println("\tset    (set chord.mappedState =  true");
-        System.out.println("\treset   (set chord.mappedState =  false");
+        System.out.println("\treset  (set chord.mappedState =  false");
+        System.out.println("\trun    (runMapReduce() )");
 
 
         System.out.println("\t");
