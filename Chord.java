@@ -220,7 +220,6 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
         Long guid = md5( k + "reverseIndex" + k );
         System.out.println(TAG + ": key = " + k); // DEBUG
 
-
         try
         {
           ChordMessageInterface peer = this.locateSuccessor(guid); // locate successor
@@ -238,10 +237,11 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
             //WIP
 
             //save temporary file in local repository
+            System.out.println(TAG + "(): temp guid = " + guid); // DEBUG
             this.put(guid, gson.toJson(entry.getValue()));
 
             //send using RemoteInputFileStream
-            RemoteInputFileStream file = new RemoteInputFileStream(guid); //WIP: debugging
+            RemoteInputFileStream file = new RemoteInputFileStream(prefix + guid+""); //WIP: debugging
             peer.store(file);
 
             //TODO: remove from local tree
@@ -618,7 +618,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
         int j;
         // Initialize the variables
         prefix = "./" + guid + "/repository/";
-        mapPrefix = prefix + "/map/";
+        mapPrefix = "map/";
 	    finger = new ChordMessageInterface[M];
         for (j=0;j<M; j++){
 	       finger[j] = null;
