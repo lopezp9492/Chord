@@ -33,6 +33,10 @@ public class DFSCommand
             {
                 dfs.join("127.0.0.1", Integer.parseInt(result[1]));     
             }
+            if (result[0].equals("j") )
+            {
+                dfs.join("127.0.0.1", 2020);     
+            }
 
             if (result[0].equals("print"))
             {
