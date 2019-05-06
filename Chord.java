@@ -246,17 +246,15 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
             System.out.println(": size: " + tm.get(k).size() );
 
             // Save temporary file in local repository
-            //System.out.println(TAG + "(): temp guid = " + guid); // DEBUG
+            // System.out.println(TAG + "(): temp guid = " + guid); // DEBUG
             this.put(guid, gson.toJson( tm.get(k) ) );
 
             // send using RemoteInputFileStream
-            RemoteInputFileStream file = new RemoteInputFileStream(prefix + guid+""); //WIP: debugging
+            RemoteInputFileStream file = new RemoteInputFileStream(prefix + guid+"", true); //WIP: debugging
             peer.store(file, k);
 
-            // WIP // TODO: remove from local tree
+            //remove from local tree
             it.remove();
-
-            // TODO: remove temp file from repository
           }
         
         }
