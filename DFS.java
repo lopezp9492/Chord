@@ -1324,7 +1324,7 @@ public class DFS
         
 
 
-        //WIP: Work In Progress
+        //WIP: Work In Progress //Debugging
         //All peers sendAll()
         System.out.println("Calling Peers to sendAll()");
         chord.callSuccesorToSendAll(chord.getId(), 0);
@@ -1333,9 +1333,12 @@ public class DFS
         // 2nd Delay
         System.out.println("waiting on peers to finish sending.");
         done  = false;
+
+        Long startTime = System.currentTimeMillis();
+        Long limit = (long)10000;
         while(!done)
         {
-            Thread.sleep(2000); // Sleep to prevent sending too many messages while checking the chord state
+            Thread.sleep(5000); // Sleep to prevent sending too many messages while checking the chord state
 
             try
             {
@@ -1348,6 +1351,18 @@ public class DFS
                 System.out.println( TAG + ": ERROR : 2nd delay failed : arePagesSent.");
                 done = true;
                 return;
+            }
+
+            //Check Time limit
+            Long endTime = System.currentTimeMillis();
+            Long runTime = endTime-startTime;
+
+            //Compare runtime with limit
+            int result = Long.compare(runTime, limit);
+            if(result > 0)
+            {
+                System.out.println("sendAll() reached time limit");
+                done = true;
             }
         }
         System.out.println("sendAll() Done.");
