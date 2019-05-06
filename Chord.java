@@ -122,7 +122,6 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
           throw(new RemoteException("File does not exists"));
       }
 
-
       //for each catalog item in the page
       for(int i = 0 ; i < catalogPage.size(); i++ )
       {
@@ -132,11 +131,14 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
         line = line + " " + catalogPage.getItem(i).release.name; // album
         line = line + " " + catalogPage.getItem(i).song.title;
 
-        //System.out.println("line: (" + line +")"); // DEBUG - Print Line
+        //lowercase
         line = line.toLowerCase();
 
         //replace punctuation with spaces
         line = line.replaceAll("[^\\w]", " ");
+
+        //trim
+        line = line.trim();
 
         //System.out.println(TAG + ": line(" + line + ")"); // DEBUG
 
@@ -218,7 +220,6 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
       Gson gson = new Gson();
 
       //for each node in TreeMap
-
       Iterator<String> it = tm.keySet().iterator();
       while (it.hasNext())
       {
@@ -243,15 +244,15 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
           }
           else //send to proper peer
           {
-            System.out.println(": size: " + tm.get(k).size() );
+            System.out.println(": size: " + tm.get(k).size() +" guid: " + guid);
 
             // Save temporary file in local repository
             // System.out.println(TAG + "(): temp guid = " + guid); // DEBUG
-            this.put(guid, gson.toJson( tm.get(k) ) );
-
-            // send using RemoteInputFileStream
-            RemoteInputFileStream file = new RemoteInputFileStream(prefix + guid+"", true); //WIP: debugging
-            peer.store(file, k);
+            // System.out.println("put..."); // DEBUG
+            if(k.compareTo("") != 0)
+            {
+              peer.put(guid, gson.toJson( tm.get(k) ) ); // WIP: debugging
+            }
 
             //remove from local tree
             it.remove();
@@ -298,6 +299,8 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
       //receive data
       CatalogPage catalogPage = new CatalogPage();
       try {
+        Thread.sleep(10);
+
 
         //System.out.println(TAG + ": connect()"); // DEBUG
         rawdata.connect();
@@ -719,6 +722,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     public void put(long guidObject, String text) throws RemoteException {
         try {
           String fileName = prefix + guidObject;
+          //System.out.println("fileName:" + fileName); //DEBUG
           FileOutputStream output = new FileOutputStream(fileName);
           output.write(text.getBytes());
           output.close();
