@@ -56,6 +56,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     TreeMap <String, CatalogPage> tm;         // <key, [v1, v2, v3, ...]> // aka <key,CataloPage>
     HashMap <String, Integer> pagesToProcess;  // <NameOfFile, pageCount> 
     Boolean mappedState;
+    Boolean sentState;
 
 
     //-----MY METHODS------
@@ -197,6 +198,8 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     //WIP remove node once it is sent
     public void sendAll()
     {
+      String TAG = "sendAll";
+      //System.out.println(TAG + "()");
 
       //-----OutLine-----
       //for each node in TreeMap
@@ -206,6 +209,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
         //else skip to next node
 
       //-----Implementation-----
+
       Gson gson = new Gson();
 
       //for each node in TreeMap
@@ -214,6 +218,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
         //determine guid
         String k = entry.getKey();
         Long guid = md5( k + "reverseIndex" + k );
+        System.out.println(TAG + ": key = " + k); // DEBUG
 
         try
         {
@@ -229,21 +234,30 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
           }
           else //send to proper peer
           {
-            //save to temporary file?
-            //TODO: Test Compilation
+            //WIP
+
+            //save temporary file in local repository
+            //System.out.println(TAG + "(): temp guid = " + guid); // DEBUG
+            this.put(guid, gson.toJson(entry.getValue()));
 
             //send using RemoteInputFileStream
-            RemoteInputFileStream file = new RemoteInputFileStream(gson.toJson( entry.getValue() ) ); //WIP test
-            peer.store(file);
+            RemoteInputFileStream file = new RemoteInputFileStream(prefix + guid+""); //WIP: debugging
+            peer.store(file, k);
+
+            //TODO: remove from local tree
+            //TODO: remove temp file from repository
           }
         
         }
         catch(Exception e)
         {
-            System.out.println("something bad happened in sendAll() function");
+            System.out.println(TAG + "(): ERROR : could not send.");
+            return;
         }
       
       }//END for each node in TreeMap
+
+      this.sentState = true; // TODO: generalize, use a HashMap similar to arePagesMapped();
 
     }//END sendAll()
 
@@ -253,11 +267,18 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
 
     }
 
+    /**
+      key is passed only for debug purposes
+    **/
     //place received file into TreeMap
       //if tree map already contains the key then combine received page with current page
       //else just store the new page
-    public void store(RemoteInputFileStream rawdata) throws RemoteException
+    public void store(RemoteInputFileStream rawdata, String key) throws RemoteException
     {
+      String TAG = "store";
+      System.out.println(TAG + "(): key = " + key); // DEBUG
+
+
       //-----OutLine-----
       //receive data
       //place received file into TreeMap
@@ -268,14 +289,24 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
       //receive data
       CatalogPage catalogPage = new CatalogPage();
       try {
+
+        //System.out.println(TAG + ": connect()"); // DEBUG
         rawdata.connect();
+
+        //System.out.println(TAG + ": scannner(rawdata)"); // DEBUG
         Scanner scan = new Scanner(rawdata);
         scan.useDelimiter("\\A");
+
+        //System.out.println(TAG + ": scan.next()"); // DEBUG
         String data = scan.next();
+
+        //System.out.println(TAG + ": gson.fromJson(data, CatalogPage.class) ");// DEBUG
         Gson gson = new Gson();
         catalogPage = gson.fromJson(data, CatalogPage.class);
+
       } catch (Exception e)
       {
+          System.out.println(TAG + ": ERROR : receiving data (connect, scan, convert)");
           throw(new RemoteException(":error in store():"));
       }
       //place received file into TreeMap
@@ -307,6 +338,9 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
 
     public void bulk()
     {
+      String TAG = "bulk";
+      System.out.println(TAG + "()");
+
       //-----OutLine-----
       //for each CatalogPage in TreeMap
         //generate guid
@@ -321,15 +355,26 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
         Long guid = md5( k + "reverseIndex" + k );
         Gson gson = new Gson();
         String jsonString = gson.toJson(entry.getValue()); // Convert CatalogPage to Json
-        try 
+
+        //filter // store only CatalogPages that belong to this peer
+        int result = Long.compare(guid, this.guid);
+        if(result == 0 )
         {
-          this.put(guid,jsonString);
-        } 
-        catch (RemoteException e) 
-        {
-        e.printStackTrace();
+          try 
+          {
+            this.put(guid,jsonString);
+            System.out.println(TAG + ": key = " + k ); // DEBUG
+          } 
+          catch (RemoteException e) 
+          {
+            e.printStackTrace();
+          }
         }
-        
+        else
+        {
+          // The node does not belong in this peer
+          // Ignore it.
+        }
       }
     }
 
@@ -339,6 +384,45 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     }
 
     //WIP Testing
+    public void arePagesSent(long source, String fileName, Boolean state, int n) throws RemoteException
+    {
+      String TAG = "arePagesSent";
+      System.out.println(TAG + "(): id: " + this.guid); // DEBUG
+
+      //if its the initial call, then call the successor
+      if(n==0)
+      {
+        successor.arePagesSent(source, fileName, this.sentState, ++n);
+      }
+      else
+      {
+        //compare the guids
+        int result = Long.compare(source, this.guid);
+
+        if(result == 0)// if result == 0 they are equal // this is the start of the chord
+        {
+          this.sentState = state;
+          System.out.println(TAG + "(): id: " + this.guid + ": state: " + this.sentState);
+        }
+        else
+        {
+          //if the previous state was incomplete then 
+          if(!state)
+          {
+            //passe it along to the other peers
+            successor.arePagesSent(source, fileName, state, ++n);
+          }
+          //else the previous state was positive , check the local state and pass to the successor.
+          else// state == true //
+          {
+            System.out.println(TAG + "(): id: " + this.guid + ": state: " + this.sentState);
+            successor.arePagesSent(source, fileName, this.sentState, ++n);
+          }
+        }
+      }
+    }
+
+
     public void arePagesMapped(long source, String fileName, Boolean state, int n) throws RemoteException
     {
       String TAG = "arePagesMapped";
@@ -425,6 +509,33 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
       }
     }
 
+    public void callSuccesorToBulk(long source, int n) throws RemoteException
+    {
+      String TAG = "callSuccesorToBulk";
+      System.out.println(TAG + "("+ source + ", " + n + "): this.id = " + this.guid );  // DEBUG
+
+      if(n==0)//if this is the first message
+      {
+        successor.callSuccesorToBulk(source, ++n);
+        this.bulk();
+      }
+      else
+      {
+        int result = Long.compare(source, this.guid);
+
+        if(result == 0)// if result == 0 the guids are equal
+        {
+          // We reached the start of the chord.
+          // Stop sending messages.
+        }
+        else
+        {
+          successor.callSuccesorToBulk(source, ++n);
+          this.bulk();
+        }
+      }
+    }
+
     public void callSuccesorToSendAll(long source, int n) throws RemoteException
     {
       //System.out.println("source id: " + source);     // DEBUG
@@ -507,11 +618,12 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
       tm = new TreeMap<String, CatalogPage>();
       pagesToProcess = new HashMap<String, Integer>();
       this.mappedState = false;
+      this.sentState = false;
 
         int j;
         // Initialize the variables
         prefix = "./" + guid + "/repository/";
-        mapPrefix = prefix + "/map/";
+        mapPrefix = "map/";
 	    finger = new ChordMessageInterface[M];
         for (j=0;j<M; j++){
 	       finger[j] = null;
