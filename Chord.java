@@ -539,7 +539,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     public void callSuccesorToSendAll(long source, int n) throws RemoteException
     {
       //System.out.println("source id: " + source);     // DEBUG
-      //System.out.println("this   id: " + this.guid);  //CDEBUG
+      //System.out.println("this   id: " + this.guid);  // DEBUG
 
       if(n==0)//if this is the first message
       {

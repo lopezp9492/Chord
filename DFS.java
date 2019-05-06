@@ -1305,7 +1305,8 @@ public class DFS
         Boolean done  = false;
         while(!done)
         {
-            Thread.sleep(3000); // Sleep to prevent sending too many messages while checking the chord state
+            System.out.println("Thread.sleep(500)..."); // DEBUG
+            Thread.sleep(500); // Sleep to prevent sending too many messages while checking the chord state
             try
             {
                 Long id = chord.getId();
@@ -1338,8 +1339,8 @@ public class DFS
         Long limit = (long)10000;
         while(!done)
         {
-            Thread.sleep(5000); // Sleep to prevent sending too many messages while checking the chord state
-
+            System.out.println("Thread.sleep(500)..."); // DEBUG
+            Thread.sleep(500); // Sleep to prevent sending too many messages while checking the chord state
             try
             {
                 Long id =chord.getId();
