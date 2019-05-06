@@ -199,7 +199,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     public void sendAll()
     {
       String TAG = "sendAll";
-      System.out.println(TAG + "()");
+      //System.out.println(TAG + "()");
 
       //-----OutLine-----
       //for each node in TreeMap
@@ -237,12 +237,12 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
             //WIP
 
             //save temporary file in local repository
-            System.out.println(TAG + "(): temp guid = " + guid); // DEBUG
+            //System.out.println(TAG + "(): temp guid = " + guid); // DEBUG
             this.put(guid, gson.toJson(entry.getValue()));
 
             //send using RemoteInputFileStream
             RemoteInputFileStream file = new RemoteInputFileStream(prefix + guid+""); //WIP: debugging
-            peer.store(file);
+            peer.store(file, k);
 
             //TODO: remove from local tree
             //TODO: remove temp file from repository
@@ -267,12 +267,17 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
 
     }
 
+    /**
+      key is passed only for debug purposes
+    **/
     //place received file into TreeMap
       //if tree map already contains the key then combine received page with current page
       //else just store the new page
-    public void store(RemoteInputFileStream rawdata) throws RemoteException
+    public void store(RemoteInputFileStream rawdata, String key) throws RemoteException
     {
       String TAG = "store";
+      System.out.println(TAG + "(): key = " + key); // DEBUG
+
 
       //-----OutLine-----
       //receive data
@@ -285,17 +290,17 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
       CatalogPage catalogPage = new CatalogPage();
       try {
 
-        System.out.println(TAG + ": connect()"); // DEBUG
+        //System.out.println(TAG + ": connect()"); // DEBUG
         rawdata.connect();
 
-        System.out.println(TAG + ": scannner(rawdata)"); // DEBUG
+        //System.out.println(TAG + ": scannner(rawdata)"); // DEBUG
         Scanner scan = new Scanner(rawdata);
         scan.useDelimiter("\\A");
 
-        System.out.println(TAG + ": scan.next()"); // DEBUG
+        //System.out.println(TAG + ": scan.next()"); // DEBUG
         String data = scan.next();
 
-        System.out.println(TAG + ": gson.fromJson(data, CatalogPage.class) ");// DEBUG
+        //System.out.println(TAG + ": gson.fromJson(data, CatalogPage.class) ");// DEBUG
         Gson gson = new Gson();
         catalogPage = gson.fromJson(data, CatalogPage.class);
 
