@@ -53,7 +53,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     int chordSize;
 
     //Extra Variables
-    TreeMap <String, CatalogPage> tm;         // <key, [v1, v2, v3, ...]> // aka <key,CataloPage>
+    TreeMap <String, CatalogPage> tm;           // <key, [v1, v2, v3, ...]> // aka <key,CataloPage>
     HashMap <String, Integer> pagesToProcess;  // <NameOfFile, pageCount> 
     Boolean mappedState;
     Boolean sentState;
@@ -66,18 +66,18 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     private void increasePtPCount(String fileName)
     {
       String TAG = "increasePagesCount";
-      System.out.println(TAG + "(" + fileName + ")");
+      //System.out.println(TAG + "(" + fileName + ")");
 
       if(pagesToProcess.containsKey(fileName))
       {
         int count = pagesToProcess.get(fileName);
         pagesToProcess.put(fileName, count+1);
-        System.out.println(TAG + "(): count = " + pagesToProcess.get(fileName) ); // DEBUG
+        //System.out.println(TAG + "(): count = " + pagesToProcess.get(fileName) ); // DEBUG
       }
       else
       {
         pagesToProcess.put(fileName, 1);
-        System.out.println(TAG + "(): count = " + pagesToProcess.get(fileName) ); // DEBUG
+        //System.out.println(TAG + "(): count = " + pagesToProcess.get(fileName) ); // DEBUG
       }
     }
 
@@ -134,6 +134,11 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
 
         //System.out.println("line: (" + line +")"); // DEBUG - Print Line
         line = line.toLowerCase();
+
+        //replace punctuation with spaces
+        line = line.replaceAll("[^\\w]", " ");
+
+        //System.out.println(TAG + ": line(" + line + ")"); // DEBUG
 
         //Separate line into words
         String[] words = line.split("\\s+");
@@ -213,45 +218,51 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
       Gson gson = new Gson();
 
       //for each node in TreeMap
-      for(Map.Entry<String,CatalogPage> entry : tm.entrySet()) 
+
+      Iterator<String> it = tm.keySet().iterator();
+      while (it.hasNext())
       {
         //determine guid
-        String k = entry.getKey();
+        String k = it.next();
         Long guid = md5( k + "reverseIndex" + k );
-        System.out.println(TAG + ": key = " + k); // DEBUG
+        System.out.print(TAG + ": key = " + k); // DEBUG
 
         try
         {
-          ChordMessageInterface peer = this.locateSuccessor(guid); // locate successor
+          // locate successor of guid
+          ChordMessageInterface peer = this.locateSuccessor(guid); 
 
-          //compare guids (compare long values)
+          //compare guids of the entry successor (peer) and the local guid (this.guid)
           int result = Long.compare(peer.getId(), this.guid);
 
           //if successor is this peer
           if(result == 0)
           {
-            //skip to next node
+            //skip to next node"
+            System.out.println(": skip."); // DEBUG
           }
           else //send to proper peer
           {
-            //WIP
+            System.out.println(": size: " + tm.get(k).size() );
 
-            //save temporary file in local repository
+            // Save temporary file in local repository
             //System.out.println(TAG + "(): temp guid = " + guid); // DEBUG
-            this.put(guid, gson.toJson(entry.getValue()));
+            this.put(guid, gson.toJson( tm.get(k) ) );
 
-            //send using RemoteInputFileStream
+            // send using RemoteInputFileStream
             RemoteInputFileStream file = new RemoteInputFileStream(prefix + guid+""); //WIP: debugging
             peer.store(file, k);
 
-            //TODO: remove from local tree
-            //TODO: remove temp file from repository
+            // WIP // TODO: remove from local tree
+            it.remove();
+
+            // TODO: remove temp file from repository
           }
         
         }
         catch(Exception e)
         {
-            System.out.println(TAG + "(): ERROR : could not send.");
+            System.out.println(TAG + "(): ERROR : could not send key: (" + k + ")" );
             return;
         }
       
@@ -383,7 +394,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
       return this.chordSize;
     }
 
-    //WIP Testing
+    
     public void arePagesSent(long source, String fileName, Boolean state, int n) throws RemoteException
     {
       String TAG = "arePagesSent";
@@ -465,19 +476,26 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
       }
     }
 
-    //WIP: Testing
     private Boolean isPagesToProcessZero(String fileName)
     {
       String TAG = "isPagesToProcessZero";
       //System.out.println(TAG + "("+ fileName +"): result = " + pagesToProcess.get(fileName)); // DEBUG
 
-      if(pagesToProcess.get(fileName) == 0)
+      //check if this peer has processed any pages of this file.
+      if(pagesToProcess.containsKey(fileName))
+      {
+        if(pagesToProcess.get(fileName) == 0)
+        {
+          return true;
+        }
+        else
+        {
+          return false;
+        }
+      }
+      else // if it has not processed any pages of the given fileName return true
       {
         return true;
-      }
-      else
-      {
-        return false;
       }
     }
 
@@ -566,10 +584,10 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     public void onPageCompleted(String fileName) throws RemoteException
     {
       String TAG = "onPageCompleted";
-      System.out.println(TAG  + "(" + fileName + ")"); // DEBUG
+      //System.out.println(TAG  + "(" + fileName + ")"); // DEBUG
       int count = pagesToProcess.get(fileName);
       pagesToProcess.put(fileName, count-1);
-      System.out.println(TAG + ": count = "+ pagesToProcess.get(fileName)); // DEBUG
+      //System.out.println(TAG + ": count = "+ pagesToProcess.get(fileName)); // DEBUG
     }
 
 
