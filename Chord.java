@@ -368,25 +368,37 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
         Gson gson = new Gson();
         String jsonString = gson.toJson(entry.getValue()); // Convert CatalogPage to Json
 
-        //filter // store only CatalogPages that belong to this peer
-        int result = Long.compare(guid, this.guid);
-        if(result == 0 )
+        try
         {
-          try 
+          ChordMessageInterface peer = this.locateSuccessor(guid); 
+          
+          //filter // store only CatalogPages that belong to this peer
+          int result = Long.compare(peer.getId(), this.guid );
+          if(result == 0 )
           {
-            this.put(guid,jsonString);
-            System.out.println(TAG + ": key = " + k ); // DEBUG
-          } 
-          catch (RemoteException e) 
+            try 
+            {
+              this.put(guid,jsonString);
+              System.out.println(TAG + ": key = " + k ); // DEBUG
+            } 
+            catch (RemoteException e) 
+            {
+              e.printStackTrace();
+            }
+          }
+          else
           {
-            e.printStackTrace();
+            // The node does not belong in this peer
+            // Ignore it.
+            System.out.println(TAG + ": key = " + k + " : ignored."); // DEBUG
           }
         }
-        else
+        catch(Exception e)
         {
-          // The node does not belong in this peer
-          // Ignore it.
+            System.out.println(TAG + ": ERROR : could not get peer.getId(). ");
         }
+
+        
       }
     }
 
