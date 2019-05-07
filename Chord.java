@@ -273,6 +273,8 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     //Send an item  "key, <s1, s2, s3...> " aka CatalogPage
     public void store(long guid) throws RemoteException
     {
+      String TAG = "store";
+
       CatalogPage catalogPage = new CatalogPage();
       try{
           //Remote Input File Stream
