@@ -402,6 +402,8 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
 
 
       //-----Implementation-----
+
+      //for each CatalogPage in TreeMap
       for(Map.Entry<String,CatalogPage> entry : tm.entrySet()) 
       {
         String k = entry.getKey();
