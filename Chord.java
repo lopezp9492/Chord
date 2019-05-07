@@ -270,7 +270,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
 
     }
 
-    //Send an item  "key, <s1, s2, s3...> " aka CatalogPage
+    //Store the temp file into the TreeMap
     public void store(long guid) throws RemoteException
     {
       String TAG = "store";
