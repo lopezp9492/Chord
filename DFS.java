@@ -904,10 +904,14 @@ public class DFS
 
         //get key out of filter // assuming one word for now // for multiple word filter: split filter then do multiple searches
         String key = "?";
-		if(filter.length()>2)
+		if(filter.length() > 2)
 		{
 			key = filter.substring(0,2);//get first 2 characters only
 		}
+        else
+        {
+            key = filter;
+        }
 
         //re-generate guid from key
         Long guid = md5(key + "reverseIndex" + key );
