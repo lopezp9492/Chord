@@ -892,7 +892,6 @@ public class DFS
 		return peer.get(guid);
     }
 
-    //TODO timing
     public JsonObject indexSearch(String filter, int count) throws Exception
     {
 
@@ -1004,7 +1003,6 @@ public class DFS
 	    	System.out.println(TAG + ": Find music.json in metadata"); // DEBUG
     		FileJson file = files.getFile(0);//I know this is not good, I'm assuming that only music.json exists in files.
     		System.out.println(TAG + ": file.getNumberOfPages(): "  + file.getNumberOfPages() ); // DEBUG
-
 
 	    	// Count number of songs
 	    	int songs_found = 0;
