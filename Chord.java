@@ -306,7 +306,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
       //Merge with tree
 
       //if tree map already contains the key 
-      System.out.print(TAG + " : capa.getKey() (" + catalogPage.getKey() + ")"); //DEBUG
+      System.out.println(TAG + " : capa.getKey() (" + catalogPage.getKey() + ")"); //DEBUG
       if(tm.containsKey(catalogPage.getKey()))
       {
         //then combine received page with current page
