@@ -145,18 +145,6 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
         //Separate line into words
         String[] words = line.split("\\s+");
 
-
-        //TODO
-        //Remove punctuation // Remove Special Symbols
-        /**
-        for (int j = 0; j < words.length; j++) {
-          // You may want to check for a non-word character before blindly
-          // performing a replacement
-          // It may also be necessary to adjust the character class
-          words[i] = words[i].replaceAll("[^\\w]", "");
-        }
-        **/
-
         //For each word
         for (int k = 0; k < words.length; k++) {
           //System.out.println("\t"+ "word: (" + words[k] +")"); // DEBUG - Print each word
@@ -180,6 +168,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
           {
             //add song to new CatalogPage
             CatalogPage capa = new CatalogPage();
+            capa.setKey(key);
             capa.addItem(catalogPage.getItem(i));
 
             //add first two chars of word to Hash ()
@@ -251,7 +240,11 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
             // System.out.println("put..."); // DEBUG
             if(k.compareTo("") != 0)
             {
-              peer.put(guid, gson.toJson( tm.get(k) ) ); // WIP: debugging
+              //Store Temp File in Peer
+              peer.put(guid, gson.toJson( tm.get(k) ) ); // it overwrites data in destination.
+
+              // Tell peer to merge file with its local TreeMap
+              peer.store(guid);
             }
 
             //remove from local tree
@@ -277,6 +270,56 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
 
     }
 
+    //Send an item  "key, <s1, s2, s3...> " aka CatalogPage
+    public void store(long guid) throws RemoteException
+    {
+      CatalogPage catalogPage = new CatalogPage();
+      try{
+          //Remote Input File Stream
+          RemoteInputFileStream dataraw = this.get(guid);
+
+          //System.out.println("\t"+ TAG+":connecting."); // DEBUG
+          dataraw.connect();// new RFIS
+
+          //Scanner
+          //System.out.println("\t" + TAG+":scanning."); // DEBUG
+          Scanner scan = new Scanner(dataraw);
+          scan.useDelimiter("\\A");
+          String data = scan.next();
+          //System.out.println(data); // DEBUG
+
+          //Convert from json to ArrayList
+          //System.out.println("\t" + TAG + ":converting json to CatalogPage.");//DEBUG
+          Gson gson = new Gson();
+          catalogPage = gson.fromJson(data, CatalogPage.class);
+
+          //System.out.println("\t" + TAG + ":Read Complete.");
+          //System.out.println("\t page.size(): " + page.size());
+          //return page;
+      }catch(Exception e)
+      {
+          System.out.println(":error in indexSearch: ");
+      }
+
+      //Merge with tree
+
+      //if tree map already contains the key 
+      System.out.print(TAG + " : capa.getKey() (" + catalogPage.getKey() + ")"); //DEBUG
+      if(tm.containsKey(catalogPage.getKey()))
+      {
+        //then combine received page with current page
+        for(int i = 0; i < catalogPage.size(); i ++)
+        {
+          tm.get(catalogPage.getKey()).addItem(catalogPage.getItem(i) );
+        }
+      }
+      else
+      {
+        //else just store the new page
+        tm.put(catalogPage.getKey(), catalogPage);
+      }
+    }
+
     /**
       key is passed only for debug purposes
     **/
@@ -299,8 +342,6 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
       //receive data
       CatalogPage catalogPage = new CatalogPage();
       try {
-        Thread.sleep(10);
-
 
         //System.out.println(TAG + ": connect()"); // DEBUG
         rawdata.connect();
